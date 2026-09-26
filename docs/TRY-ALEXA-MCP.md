@@ -39,7 +39,7 @@ No Docker required. App Runner can build from GitHub.
    - `HOST=0.0.0.0`
    - `PORT=8790`
    - `ALLOWED_ORIGINS=https://whatsupdoc.fyi,https://www.whatsupdoc.fyi`
-5. CPU 1 vCPU / 2 GB is enough. Credits cover this easily.
+5. Instance: **0.25 vCPU / 0.5 GB**, min instances **1**, max **1** (no scale-out). LLM is xAI `grok-4-fast-non-reasoning`, not Bedrock — AWS credits only pay for App Runner, not tokens.
 6. After deploy, open `https://<id>.awsapprunner.com/health` then `/` for the Alexa sim.
 
 CLI after `aws login` (or `aws configure`):

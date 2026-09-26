@@ -52,7 +52,7 @@ export async function getCurrentWeather(args: { location?: string }): Promise<To
 export async function getForecast(args: { location?: string; days?: number }): Promise<ToolOut> {
   ensureSeeded();
   const loc = resolveLocation(args);
-  const days = args.days ?? 7;
+  const days = args.days ?? 3;
   await refreshLocation(loc, days);
   const rows = listByKind(loc.key, "forecast", days);
   if (!rows.length) {

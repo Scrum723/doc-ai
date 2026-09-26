@@ -25,7 +25,7 @@ else
     --region "${REGION}" \
     --service-name "${NAME}" \
     --source-configuration "ImageRepository={ImageIdentifier=${REPO}:latest,ImageRepositoryType=ECR,ImageConfiguration={Port=8790}}" \
-    --instance-configuration "Cpu=1 vCPU,Memory=2 GB"
+    --instance-configuration "Cpu=0.25 vCPU,Memory=0.5 GB"
 fi
 echo "Done. Set ALLOWED_ORIGINS to the App Runner HTTPS origin after first deploy."
 echo "Request \$150 AWS credits via AWS Builder if needed: https://us-east-1.console.aws.amazon.com/costmanagement/home#/credits"

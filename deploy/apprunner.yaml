@@ -1,15 +1,26 @@
-# AWS App Runner service config for Doc AI MCP
+# Smallest App Runner footprint — stretch $150 AWS credits
 version: 1.0
-runtime: docker
+runtime: nodejs22
 build:
-  dockerfilePath: Dockerfile
+  commands:
+    build:
+      - npm install --omit=dev
 run:
   network:
     port: 8790
+  command: npx tsx server/index.ts
   env:
     - name: HOST
       value: "0.0.0.0"
     - name: PORT
       value: "8790"
+    - name: GROK_MODEL
+      value: grok-4-fast-non-reasoning
+    - name: XAI_MODEL
+      value: grok-4-fast-non-reasoning
     - name: DOC_AI_DB
-      value: "/tmp/doc-ai.sqlite"
+      value: /tmp/doc-ai.sqlite
+    - name: ALLOWED_ORIGINS
+      value: https://whatsupdoc.fyi,https://www.whatsupdoc.fyi,https://api.whatsupdoc.fyi
+# Instance (set in console / CLI): 0.25 vCPU, 0.5 GB RAM, 1 instance, no auto-scale-out
+# Do NOT enable Bedrock — LLM stays on xAI (not billed to AWS credits)

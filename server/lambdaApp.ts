@@ -33,7 +33,8 @@ app.get("/health", (_req, res) => {
       methods: ["POST", "GET"],
     },
     tools: TOOL_NAMES,
-    model: process.env.GROK_MODEL || "grok-4-fast-non-reasoning",
+    llm: "alexa-plus",
+    note: "No Grok/xAI in this service. Alexa+ is the LLM; Doc AI is MCP tools only.",
   });
 });
 

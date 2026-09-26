@@ -26,8 +26,8 @@
 <body>
   <div class="phone">
     <div class="orb"></div>
-    <h1>Alexa+ · Doc AI</h1>
-    <div class="sub">Simulated Agent Skill · MCP-backed weather</div>
+    <h1>Alexa+ · Doc AI MCP</h1>
+    <div class="sub">Tool layer only · LLM is Alexa+ (no Grok)</div>
     <div class="chat" id="chat"></div>
     <div class="chips">
       <button type="button" data-q="What's the weather in Rochester?">Current</button>
@@ -48,7 +48,7 @@
       chat.appendChild(el);
       chat.scrollTop = chat.scrollHeight;
     }
-    add("agent", "Hi. I'm Doc AI on Alexa plus. Ask about Rochester weather, forecasts, alerts, history, or IoT nodes.");
+    add("agent", "Doc AI MCP tools for Alexa+. Alexa+ is the LLM. I return weather facts from Open-Meteo, NWS, and simulated IoT.");
     function route(q) {
       const s = q.toLowerCase();
       if (s.includes("iot") || s.includes("sensor")) return ["list_iot_sources", { location: "rochester" }];
@@ -83,3 +83,4 @@
   </script>
 </body>
 </html>
+

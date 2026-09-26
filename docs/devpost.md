@@ -1,18 +1,16 @@
 # Devpost paste — Doc AI
 
-**Title:** Doc AI — Alexa+ conversational weather agent
+**Title:** Doc AI — Alexa+ MCP weather Agent Skill
 
-**Tagline:** Chat with global weather: APIs plus IoT sensors, stored and spoken through MCP.
+**Tagline:** Self-hosted MCP weather tools for Alexa+ — Alexa is the LLM, Doc AI is the data brain.
 
-**Primary track:** Alexa+ only (do not submit this project to a second primary track). AWS Builder + Open Source may be layered on the same entry.
+**Primary track:** Alexa+ only.
 
 **Description:**
-Doc AI is a self-hosted MCP server (spec 2025-11-25, Streamable HTTP POST+GET on `/mcp`) that ingests Open-Meteo and National Weather Service data plus a simulated IoT sensor feed, normalizes it into SQLite, and answers Alexa+ in short spoken sentences. Tools: get_current_weather, get_forecast, get_alerts, get_historical, list_iot_sources, chat_summary. A web playground simulates Alexa+ without a device. Seed data keeps the demo honest when APIs are down. IoT is labeled simulation — not a fake live camera weather network.
+Doc AI is a free-standing self-hosted MCP server (spec 2025-11-25, Streamable HTTP on `/mcp`) for the Alexa+ track. It ingests Open-Meteo and National Weather Service data plus a simulated IoT feed into SQLite and exposes six callable tools: get_current_weather, get_forecast, get_alerts, get_historical, list_iot_sources, chat_summary. Tools return structured JSON and short spoken fact strings. **There is no Grok or third-party LLM in this submission** — Alexa / Alexa+ provides the language model and conversation. A thin web simulator shows tool routing for the demo video. Hosted cheaply on AWS Lambda Function URL.
 
-**Built with:** MCP TypeScript SDK, Node.js, Express, SQLite, Open-Meteo, NWS api.weather.gov, AWS App Runner Dockerfile
+**Built with:** MCP TypeScript SDK, Node.js, Express, SQLite, Open-Meteo, NWS api.weather.gov, AWS Lambda
 
-**What's next:** Live IoT OAuth, App Runner hosting, watches with push alerts.
+**What's next:** Live Alexa+ skill registration, IoT OAuth mesh, watches.
 
 **Repo:** https://github.com/Scrum723/doc-ai (MIT)
-
-**Demo script:** docs/demo-script.md

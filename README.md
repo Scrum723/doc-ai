@@ -1,10 +1,12 @@
 # Doc AI
 
-Conversational weather agent for the **Amazon Developer Hackathon — Alexa+ track only**.
+Self-hosted **Alexa+ Agent Skill MCP server** for the **Amazon Developer Hackathon — Alexa+ track only**.
 
-Doc AI absorbs public weather APIs plus simulated IoT sensors, stores normalized readings in SQLite, and exposes them through a self-hosted **MCP server (spec 2025-11-25, Streamable HTTP)** so Alexa+ can talk about current conditions, forecasts, alerts, and history in short spoken sentences.
+**LLM = Alexa / Alexa+.** This repo does **not** call Grok, Bedrock, or any other chat model. Doc AI is the weather tool layer: ingest → SQLite → MCP tools that return structured JSON plus short spoken fact strings. Alexa+ does the natural-language conversation on top of those tools.
 
-This is **not** a rename of DOC Watch dock-advice tools. Doc AI is a first-release ingest/store/chat product with historical + IoT + `chat_summary`.
+Doc AI absorbs public weather APIs plus simulated IoT sensors, stores normalized readings in SQLite, and exposes them through **MCP spec 2025-11-25 Streamable HTTP**.
+
+This is **not** a rename of DOC Watch dock-advice tools.
 
 ## One-command start
 
@@ -31,7 +33,7 @@ Tests: `npm test`
 | `get_alerts` | NWS `api.weather.gov` alerts (seed fallback) |
 | `get_historical` | Date-range query against stored readings |
 | `list_iot_sources` | Simulated IoT nodes |
-| `chat_summary` | Spoken briefing, no markdown |
+| `chat_summary` | Fact briefing string for Alexa+ to voice (no third-party LLM) |
 
 ## Data layer
 

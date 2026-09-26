@@ -1,84 +1,35 @@
-# Try the Alexa MCP (Doc AI) with AWS $150 credits
+# Try Doc AI as an Alexa+ MCP (no Grok)
 
-## Live AWS endpoint (Lambda Function URL — cheapest host)
+**LLM = Alexa / Alexa+.** This server is free-standing MCP weather tools for the Alexa+ hackathon track. It does not call Grok, Bedrock, or any other chat model.
+
+## Live AWS endpoint (Lambda Function URL)
 
 - Base: https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws/
-- Health: https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws/health
-- MCP: `POST .../mcp` (protocol 2025-11-25 JSON)
-- Chat UI: open the base URL
-- Model env: `grok-4-fast-non-reasoning` (xAI bill, not AWS credits)
-- Size: 512 MB ARM Lambda, pay-per-request
+- Health: …/health
+- MCP: `POST …/mcp` (protocol 2025-11-25)
+- Chat UI on `/` is a **simulator** that routes phrases to tools (not an LLM)
 
 ```powershell
 cd C:\Users\cclot\doc-ai
 node deploy/mcp-smoke.mjs https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws
 ```
 
-Wire WhatsUpDoc API:
-
-```
-DOC_AI_MCP_URL=https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws
-```
-
-## 1. Try it on this machine (now)
-
-Server: http://127.0.0.1:8790/
+## Local
 
 ```powershell
 cd C:\Users\cclot\doc-ai
 npm run dev
+# http://127.0.0.1:8790/mcp
 ```
 
-- Chat UI: http://127.0.0.1:8790/
-- Health: http://127.0.0.1:8790/health
-- MCP: `POST http://127.0.0.1:8790/mcp`
+## Alexa+ wiring
 
-Smoke:
+Point the Alexa+ Agent Skill / self-hosted MCP config at:
 
-```powershell
-cd C:\Users\cclot\doc-ai
-node deploy/mcp-smoke.mjs
-```
+`https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws/mcp`
 
-Ask in the UI: **What's the weather in Rochester?**
+Alexa+ calls `tools/list` and `tools/call`. Doc AI returns spoken fact strings + JSON. Alexa+ generates the conversation.
 
-## 2. Put it on AWS (spend the credits)
+## Cost
 
-No Docker required. App Runner can build from GitHub.
-
-1. AWS console → **App Runner** → Create service  
-   Region: `us-east-1` (or `us-east-2` if that is where the credits sit)
-2. Source: **Source code repository** → connect GitHub → `Scrum723/doc-ai` → branch `main`
-3. Runtime **Node.js 22**
-   - Build: `npm install`
-   - Start: `npm run start`
-   - Port: `8790`
-4. Env:
-   - `HOST=0.0.0.0`
-   - `PORT=8790`
-   - `ALLOWED_ORIGINS=https://whatsupdoc.fyi,https://www.whatsupdoc.fyi`
-5. Instance: **0.25 vCPU / 0.5 GB**, min instances **1**, max **1** (no scale-out). LLM is xAI `grok-4-fast-non-reasoning`, not Bedrock — AWS credits only pay for App Runner, not tokens.
-6. After deploy, open `https://<id>.awsapprunner.com/health` then `/` for the Alexa sim.
-
-CLI after `aws login` (or `aws configure`):
-
-```powershell
-cd C:\Users\cclot\doc-ai
-# still needs a GitHub connection ARN from the App Runner console first
-# then:
-aws apprunner list-connections --region us-east-1
-```
-
-## 3. Point WhatsUpDoc Talk to DOC at it
-
-On Railway for `api.whatsupdoc.fyi`:
-
-```
-DOC_AI_MCP_URL=https://<id>.awsapprunner.com
-```
-
-Then Talk to DOC can pull Doc AI MCP briefings into the neural layer.
-
-## 4. Alexa+ Developer console (optional)
-
-When the App Runner URL is live, register that Streamable HTTP endpoint as the self-hosted MCP skill URL (`/mcp`).
+AWS credits pay for Lambda only. No LLM token spend on this service.

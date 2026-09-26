@@ -17,7 +17,7 @@ import { registerTools, runTool, TOOL_NAMES } from "../agent/tools.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8790);
-const HOST = process.env.HOST || "127.0.0.1";
+const HOST = process.env.HOST || "0.0.0.0";
 
 function allowedOrigins(): string[] {
   const extra = (process.env.ALLOWED_ORIGINS || "")
@@ -29,6 +29,9 @@ function allowedOrigins(): string[] {
     `http://localhost:${PORT}`,
     "http://127.0.0.1",
     "http://localhost",
+    "https://whatsupdoc.fyi",
+    "https://www.whatsupdoc.fyi",
+    "https://api.whatsupdoc.fyi",
     ...extra,
   ];
 }
@@ -39,7 +42,12 @@ function originAllowed(origin: string | undefined): boolean {
   if (list.includes(origin)) return true;
   try {
     const u = new URL(origin);
-    return u.hostname === "127.0.0.1" || u.hostname === "localhost";
+    return (
+      u.hostname === "127.0.0.1" ||
+      u.hostname === "localhost" ||
+      u.hostname.endsWith(".awsapprunner.com") ||
+      u.hostname.endsWith(".whatsupdoc.fyi")
+    );
   } catch {
     return false;
   }
@@ -66,7 +74,12 @@ function createDocAiServer(): McpServer {
 
 const transports: Record<string, StreamableHTTPServerTransport> = {};
 
-const app = createMcpExpressApp({ host: HOST, allowedHosts: ["127.0.0.1", "localhost"] });
+const publicBind = HOST === "0.0.0.0" || HOST === "::" || HOST === "::0";
+const app = createMcpExpressApp(
+  publicBind
+    ? { host: "0.0.0.0" }
+    : { host: HOST, allowedHosts: ["127.0.0.1", "localhost"] }
+);
 app.use(cors({ origin: (o, cb) => cb(null, originAllowed(o)) }));
 app.use(express.json({ limit: "2mb" }));
 app.use(express.static(join(__dirname, "../web")));

@@ -1,0 +1,35 @@
+{
+  "name": "doc-ai",
+  "version": "1.0.0",
+  "description": "Doc AI — conversational weather agent for Alexa+ via MCP Streamable HTTP",
+  "type": "module",
+  "main": "server/index.ts",
+  "scripts": {
+    "dev": "tsx server/index.ts",
+    "start": "tsx server/index.ts",
+    "test": "vitest run",
+    "seed": "tsx data/seed.ts"
+  },
+  "keywords": ["mcp", "alexa", "weather", "doc-ai", "streamable-http"],
+  "author": "Scrum723 / Charles Clottin",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Scrum723/doc-ai"
+  },
+  "engines": { "node": ">=22" },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.12.0",
+    "tsx": "^4.23.15",
+    "typescript": "^5.8.3",
+    "vitest": "^2.1.9"
+  }
+}

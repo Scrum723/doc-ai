@@ -1,0 +1,15 @@
+# AWS App Runner service config for Doc AI MCP
+version: 1.0
+runtime: docker
+build:
+  dockerfilePath: Dockerfile
+run:
+  network:
+    port: 8790
+  env:
+    - name: HOST
+      value: "0.0.0.0"
+    - name: PORT
+      value: "8790"
+    - name: DOC_AI_DB
+      value: "/tmp/doc-ai.sqlite"

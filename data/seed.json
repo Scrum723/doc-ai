@@ -1,0 +1,153 @@
+{
+  "locations": {
+    "rochester": {
+      "key": "rochester",
+      "name": "Rochester, NY",
+      "label": "Rochester / North Greece / Long Pond",
+      "lat": 43.255,
+      "lon": -77.685
+    },
+    "fairport": {
+      "key": "fairport",
+      "name": "Fairport, NY",
+      "label": "Fairport Canal docks",
+      "lat": 43.0987,
+      "lon": -77.4419
+    },
+    "long_pond": {
+      "key": "long_pond",
+      "name": "Long Pond, Greece NY",
+      "label": "Long Pond shoreline",
+      "lat": 43.2585,
+      "lon": -77.692
+    }
+  },
+  "iotSources": [
+    {
+      "id": "iot-roc-dock-temp",
+      "name": "Long Pond dock temperature probe",
+      "locationKey": "rochester",
+      "type": "temperature",
+      "lat": 43.255,
+      "lon": -77.685,
+      "unit": "F"
+    },
+    {
+      "id": "iot-roc-humidity",
+      "name": "North Greece humidity node",
+      "locationKey": "rochester",
+      "type": "humidity",
+      "lat": 43.256,
+      "lon": -77.686,
+      "unit": "%"
+    },
+    {
+      "id": "iot-fairport-wind",
+      "name": "Fairport canal wind cup",
+      "locationKey": "fairport",
+      "type": "wind",
+      "lat": 43.0987,
+      "lon": -77.4419,
+      "unit": "mph"
+    }
+  ],
+  "historical": [
+    {
+      "locationKey": "rochester",
+      "source": "open-meteo",
+      "date": "2026-09-15",
+      "tempF": 64,
+      "humidityPct": 58,
+      "windMph": 8,
+      "precipIn": 0.0,
+      "text": "Mostly sunny"
+    },
+    {
+      "locationKey": "rochester",
+      "source": "open-meteo",
+      "date": "2026-09-16",
+      "tempF": 61,
+      "humidityPct": 72,
+      "windMph": 12,
+      "precipIn": 0.18,
+      "text": "Light rain"
+    },
+    {
+      "locationKey": "rochester",
+      "source": "open-meteo",
+      "date": "2026-09-17",
+      "tempF": 55,
+      "humidityPct": 80,
+      "windMph": 15,
+      "precipIn": 0.42,
+      "text": "Showers"
+    },
+    {
+      "locationKey": "rochester",
+      "source": "open-meteo",
+      "date": "2026-09-18",
+      "tempF": 52,
+      "humidityPct": 65,
+      "windMph": 10,
+      "precipIn": 0.02,
+      "text": "Cool and cloudy"
+    },
+    {
+      "locationKey": "rochester",
+      "source": "iot",
+      "date": "2026-09-18",
+      "tempF": 51,
+      "humidityPct": 67,
+      "windMph": 9,
+      "precipIn": 0.0,
+      "text": "Dock probe overnight low"
+    },
+    {
+      "locationKey": "fairport",
+      "source": "open-meteo",
+      "date": "2026-09-17",
+      "tempF": 57,
+      "humidityPct": 70,
+      "windMph": 11,
+      "precipIn": 0.21,
+      "text": "Canal showers"
+    }
+  ],
+  "seedCurrent": {
+    "rochester": {
+      "tempF": 55,
+      "humidityPct": 74,
+      "windMph": 6,
+      "text": "Clear"
+    },
+    "fairport": {
+      "tempF": 56,
+      "humidityPct": 71,
+      "windMph": 8,
+      "text": "Partly cloudy"
+    },
+    "long_pond": {
+      "tempF": 54,
+      "humidityPct": 78,
+      "windMph": 7,
+      "text": "Clear over the pond"
+    }
+  },
+  "seedForecast": {
+    "rochester": [
+      { "dayOffset": 0, "tempF": 58, "text": "Sunny", "windMph": 7, "precipIn": 0 },
+      { "dayOffset": 1, "tempF": 62, "text": "Partly cloudy", "windMph": 9, "precipIn": 0.05 },
+      { "dayOffset": 2, "tempF": 49, "text": "Cooler with showers", "windMph": 14, "precipIn": 0.3 }
+    ]
+  },
+  "seedAlerts": [
+    {
+      "locationKey": "rochester",
+      "source": "nws",
+      "event": "Lake Wind Advisory",
+      "headline": "Lake Wind Advisory for Monroe",
+      "severity": "Minor",
+      "text": "Gusty lake winds possible this evening."
+    }
+  ]
+}

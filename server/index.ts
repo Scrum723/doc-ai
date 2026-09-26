@@ -98,6 +98,28 @@ app.get("/health", (_req, res) => {
   });
 });
 
+app.post("/api/public/chat", async (req, res) => {
+  try {
+    const { talkToDocMcp } = await import("../agent/routeChat.js");
+    const body = req.body || {};
+    const message = String(body.message || body.q || "").trim();
+    if (!message) {
+      res.status(400).json({ error: "message is required" });
+      return;
+    }
+    res.json(
+      await talkToDocMcp({
+        message,
+        location_name: body.location_name,
+        location: body.location,
+      })
+    );
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    res.status(500).json({ error: message, response_text: `DOC MCP failed. ${message}.` });
+  }
+});
+
 app.get("/api/tools", (_req, res) => res.json({ tools: TOOL_NAMES }));
 
 app.post("/api/tools/:name", async (req, res) => {

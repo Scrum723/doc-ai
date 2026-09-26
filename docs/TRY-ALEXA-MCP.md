@@ -1,6 +1,24 @@
 # Try the Alexa MCP (Doc AI) with AWS $150 credits
 
-Local MCP is already the real Alexa+ skill surface: Streamable HTTP, spec 2025-11-25, six tools.
+## Live AWS endpoint (Lambda Function URL — cheapest host)
+
+- Base: https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws/
+- Health: https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws/health
+- MCP: `POST .../mcp` (protocol 2025-11-25 JSON)
+- Chat UI: open the base URL
+- Model env: `grok-4-fast-non-reasoning` (xAI bill, not AWS credits)
+- Size: 512 MB ARM Lambda, pay-per-request
+
+```powershell
+cd C:\Users\cclot\doc-ai
+node deploy/mcp-smoke.mjs https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws
+```
+
+Wire WhatsUpDoc API:
+
+```
+DOC_AI_MCP_URL=https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws
+```
 
 ## 1. Try it on this machine (now)
 

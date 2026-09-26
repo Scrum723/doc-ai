@@ -4,7 +4,6 @@
  */
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
 import type { NormalizedReading } from "./normalize.js";
 
 // process.getBuiltinModule avoids Vite rewriting `node:sqlite` to a missing `sqlite` package.
@@ -21,12 +20,13 @@ const { DatabaseSync } = process.getBuiltinModule("node:sqlite") as {
   DatabaseSync: new (path: string) => DatabaseSync;
 };
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
 let db: DatabaseSync | null = null;
 
 export function dbPath(): string {
-  return process.env.DOC_AI_DB || join(__dirname, "doc-ai.sqlite");
+  return (
+    process.env.DOC_AI_DB ||
+    join(process.env.AWS_LAMBDA_FUNCTION_NAME ? "/tmp" : process.cwd(), "data", "doc-ai.sqlite")
+  );
 }
 
 export function getDb(): DatabaseSync {

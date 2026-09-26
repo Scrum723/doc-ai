@@ -8,23 +8,36 @@
     "dev": "tsx server/index.ts",
     "start": "tsx server/index.ts",
     "test": "vitest run",
-    "seed": "tsx data/seed.ts"
+    "seed": "tsx data/seed.ts",
+    "build:lambda": "node deploy/build-lambda.mjs",
+    "deploy:lambda": "powershell -ExecutionPolicy Bypass -File deploy/deploy-lambda.ps1"
   },
-  "keywords": ["mcp", "alexa", "weather", "doc-ai", "streamable-http"],
+  "keywords": [
+    "mcp",
+    "alexa",
+    "weather",
+    "doc-ai",
+    "streamable-http"
+  ],
   "author": "Scrum723 / Charles Clottin",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Scrum723/doc-ai"
   },
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.30.0",
     "cors": "^2.8.6",
+    "esbuild": "^0.28.2",
     "express": "^5.2.1",
+    "serverless-http": "^4.0.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.163",
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
     "@types/node": "^22.12.0",

@@ -4,6 +4,7 @@
  * Official SDK: @modelcontextprotocol/sdk McpServer + StreamableHTTPServerTransport
  */
 import { randomUUID } from "node:crypto";
+import { existsSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { createMcpExpressApp } from "@modelcontextprotocol/sdk/server/express.js";
@@ -82,7 +83,11 @@ const app = createMcpExpressApp(
 );
 app.use(cors({ origin: (o, cb) => cb(null, originAllowed(o)) }));
 app.use(express.json({ limit: "2mb" }));
-app.use(express.static(join(__dirname, "../web")));
+const webRoot =
+  [join(__dirname, "../web"), join(__dirname, "web"), join(process.cwd(), "web")].find((p) =>
+    existsSync(p)
+  ) || join(__dirname, "../web");
+app.use(express.static(webRoot));
 
 app.get("/health", (_req, res) => {
   res.json({
@@ -105,10 +110,24 @@ app.post("/api/tools/:name", async (req, res) => {
   }
 });
 
+// Lambda Function URL / serverless-http sometimes omits or alters Content-Type.
+app.use("/mcp", (req, _res, next) => {
+  const ct = String(req.headers["content-type"] || "");
+  if (req.method === "POST" && !ct.toLowerCase().includes("application/json")) {
+    req.headers["content-type"] = "application/json";
+  }
+  next();
+});
+
 app.use("/mcp", originGuard);
 
 app.post("/mcp", async (req: Request, res: Response) => {
   console.log(`[MCP] POST /mcp method=${req.body?.method ?? "n/a"}`);
+  if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    const { handleLambdaMcpPost } = await import("./lambdaMcp.js");
+    await handleLambdaMcpPost(req, res);
+    return;
+  }
   try {
     const sessionId = req.headers["mcp-session-id"] as string | undefined;
     let transport: StreamableHTTPServerTransport;
@@ -175,11 +194,20 @@ app.delete("/mcp", async (req: Request, res: Response) => {
   delete transports[sessionId];
 });
 
+if (process.env.AWS_LAMBDA_FUNCTION_NAME && !process.env.DOC_AI_DB) {
+  process.env.DOC_AI_DB = "/tmp/doc-ai.sqlite";
+}
+
 ensureSeeded();
 
-app.listen(PORT, HOST, () => {
-  console.log(`Doc AI listening on http://${HOST}:${PORT}`);
-  console.log(`MCP Streamable HTTP (2025-11-25) POST+GET http://${HOST}:${PORT}/mcp`);
-  console.log(`Alexa+ sim: http://${HOST}:${PORT}/`);
-  console.log(`Tools: ${TOOL_NAMES.join(", ")}`);
-});
+export { app };
+
+const isLambda = Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME);
+if (!isLambda) {
+  app.listen(PORT, HOST, () => {
+    console.log(`Doc AI listening on http://${HOST}:${PORT}`);
+    console.log(`MCP Streamable HTTP (2025-11-25) POST+GET http://${HOST}:${PORT}/mcp`);
+    console.log(`Alexa+ sim: http://${HOST}:${PORT}/`);
+    console.log(`Tools: ${TOOL_NAMES.join(", ")}`);
+  });
+}

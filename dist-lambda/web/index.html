@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Doc AI — Alexa+ simulation</title>
+  <style>
+    :root { --bg:#0d1117; --card:#161b22; --a:#58a6ff; --t:#e6edf3; --m:#8b949e; }
+    * { box-sizing: border-box; }
+    body { margin:0; min-height:100vh; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--t); display:grid; place-items:center; padding:1rem; }
+    .phone { width:min(420px,100%); background:#11161d; border:1px solid #30363d; border-radius:28px; padding:1.2rem; }
+    .orb { width:64px; height:64px; border-radius:50%; margin:0.4rem auto 0.8rem; background:radial-gradient(circle at 30% 30%, #9cf, var(--a), #123); }
+    h1 { text-align:center; font-size:1.1rem; margin:0; }
+    .sub { text-align:center; color:var(--m); font-size:0.85rem; margin:0.3rem 0 0.8rem; }
+    .chat { background:var(--card); border-radius:16px; height:360px; overflow:auto; padding:0.75rem; display:flex; flex-direction:column; gap:0.55rem; }
+    .msg { max-width:92%; padding:0.65rem 0.8rem; border-radius:14px; font-size:0.92rem; line-height:1.4; white-space:pre-wrap; }
+    .user { align-self:flex-end; background:#21262d; }
+    .agent { align-self:flex-start; background:#0d2137; border:1px solid #1f4b73; }
+    form { display:flex; gap:0.5rem; margin-top:0.8rem; }
+    input { flex:1; border-radius:999px; border:1px solid #30363d; background:#0d1117; color:var(--t); padding:0.7rem 1rem; font:inherit; }
+    button { border:none; border-radius:999px; background:var(--a); color:#041018; font-weight:700; padding:0 1rem; cursor:pointer; }
+    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.7rem; }
+    .chips button { background:#21262d; color:var(--t); font-size:0.75rem; padding:0.4rem 0.65rem; }
+  </style>
+</head>
+<body>
+  <div class="phone">
+    <div class="orb"></div>
+    <h1>Alexa+ · Doc AI</h1>
+    <div class="sub">Simulated Agent Skill · MCP-backed weather</div>
+    <div class="chat" id="chat"></div>
+    <div class="chips">
+      <button type="button" data-q="What's the weather in Rochester?">Current</button>
+      <button type="button" data-q="Give me the three day forecast.">Forecast</button>
+      <button type="button" data-q="Any alerts?">Alerts</button>
+      <button type="button" data-q="What were conditions from 2026-09-15 to 2026-09-18?">History</button>
+      <button type="button" data-q="List my IoT sensors.">IoT</button>
+      <button type="button" data-q="Give me a briefing.">Briefing</button>
+    </div>
+    <form id="form"><input id="input" placeholder="Ask Doc AI…" autocomplete="off" /><button type="submit">Ask</button></form>
+  </div>
+  <script>
+    const chat = document.getElementById("chat");
+    function add(role, text) {
+      const el = document.createElement("div");
+      el.className = "msg " + role;
+      el.textContent = text;
+      chat.appendChild(el);
+      chat.scrollTop = chat.scrollHeight;
+    }
+    add("agent", "Hi. I'm Doc AI on Alexa plus. Ask about Rochester weather, forecasts, alerts, history, or IoT nodes.");
+    function route(q) {
+      const s = q.toLowerCase();
+      if (s.includes("iot") || s.includes("sensor")) return ["list_iot_sources", { location: "rochester" }];
+      if (s.includes("brief") || s.includes("summary") || s.includes("tell me everything")) return ["chat_summary", { location: "rochester" }];
+      if (s.includes("histor") || s.includes("2026-09") || s.includes("last week")) return ["get_historical", { location: "rochester", date_range: "2026-09-15 to 2026-09-18" }];
+      if (s.includes("alert")) return ["get_alerts", { location: "rochester" }];
+      if (s.includes("forecast") || s.includes("tomorrow") || s.includes("days")) return ["get_forecast", { location: "rochester", days: 3 }];
+      return ["get_current_weather", { location: "rochester" }];
+    }
+    async function ask(q) {
+      add("user", q);
+      const [tool, body] = route(q);
+      add("agent", "Checking " + tool + "…");
+      try {
+        const res = await fetch("/api/tools/" + tool, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const data = await res.json();
+        chat.removeChild(chat.lastChild);
+        add("agent", data.spoken || data.error || JSON.stringify(data));
+      } catch (e) {
+        chat.removeChild(chat.lastChild);
+        add("agent", "Something went wrong. " + (e.message || e));
+      }
+    }
+    document.getElementById("form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const q = document.getElementById("input").value.trim();
+      if (!q) return;
+      document.getElementById("input").value = "";
+      ask(q);
+    });
+    document.querySelectorAll(".chips button").forEach((b) => b.addEventListener("click", () => ask(b.getAttribute("data-q"))));
+  </script>
+</body>
+</html>

@@ -1,6 +1,5 @@
 import { readFileSync } from "node:fs";
-import { dirname, join } from "node:path";
-import { fileURLToPath } from "node:url";
+import { join } from "node:path";
 
 export type LocationRecord = {
   key: string;
@@ -14,13 +13,29 @@ type SeedFile = {
   locations: Record<string, LocationRecord>;
 };
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const SEED_PATH = join(__dirname, "seed.json");
+const SEED_CANDIDATES = [
+  join(process.cwd(), "data", "seed.json"),
+  join(process.cwd(), "seed.json"),
+  join("/var/task", "data", "seed.json"),
+  join("/var/task", "seed.json"),
+];
 
 let cached: SeedFile | null = null;
 
+function seedPath(): string {
+  for (const p of SEED_CANDIDATES) {
+    try {
+      readFileSync(p, "utf8");
+      return p;
+    } catch {
+      /* try next */
+    }
+  }
+  throw new Error(`seed.json not found in ${SEED_CANDIDATES.join(", ")}`);
+}
+
 export function loadSeed(): any {
-  if (!cached) cached = JSON.parse(readFileSync(SEED_PATH, "utf8"));
+  if (!cached) cached = JSON.parse(readFileSync(seedPath(), "utf8"));
   return cached;
 }
 

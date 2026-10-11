@@ -7,6 +7,7 @@ export type LocationRecord = {
   label: string;
   lat: number;
   lon: number;
+  unknown?: boolean;
 };
 
 type SeedFile = {
@@ -55,9 +56,11 @@ export function resolveLocation(input?: {
       lon: input.lon,
     };
   }
-  const raw = (input?.location || input?.city || process.env.DEFAULT_LOCATION || "rochester")
-    .trim()
-    .toLowerCase();
+  const raw = (input?.location || input?.city || "").trim().toLowerCase();
+  if (!raw) {
+    const fallback = (process.env.DEFAULT_LOCATION || "rochester").toLowerCase();
+    return data.locations[fallback] || data.locations.rochester;
+  }
   for (const loc of Object.values(data.locations)) {
     if (loc.key === raw || loc.name.toLowerCase() === raw || loc.label.toLowerCase().includes(raw)) {
       return loc;
@@ -66,7 +69,14 @@ export function resolveLocation(input?: {
   for (const loc of Object.values(data.locations)) {
     if (raw.includes(loc.key) || loc.name.toLowerCase().includes(raw)) return loc;
   }
-  return data.locations.rochester;
+  return {
+    key: "unknown",
+    name: raw,
+    label: raw,
+    lat: 0,
+    lon: 0,
+    unknown: true,
+  };
 }
 
 export function listLocations(): LocationRecord[] {

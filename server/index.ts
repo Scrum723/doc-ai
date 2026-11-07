@@ -81,7 +81,13 @@ const app = createMcpExpressApp(
     ? { host: "0.0.0.0" }
     : { host: HOST, allowedHosts: ["127.0.0.1", "localhost"] }
 );
-app.use(cors({ origin: (o, cb) => cb(null, originAllowed(o)) }));
+app.use(
+  cors({
+    origin: (o, cb) => cb(null, originAllowed(o)),
+    exposedHeaders: ["mcp-session-id", "Mcp-Session-Id"],
+    allowedHeaders: ["Content-Type", "Accept", "mcp-session-id", "MCP-Protocol-Version"],
+  })
+);
 app.use(express.json({ limit: "2mb" }));
 const webRoot =
   [join(__dirname, "../web"), join(__dirname, "web"), join(process.cwd(), "web")].find((p) =>

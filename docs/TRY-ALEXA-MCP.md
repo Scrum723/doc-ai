@@ -7,7 +7,7 @@
 - Base: https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws/
 - Health: …/health
 - MCP: `POST …/mcp` (protocol 2025-11-25)
-- Chat UI on `/` is a **simulator** that routes phrases to tools (not an LLM)
+- Chat UI on `/` is an Echo Show **simulator** that is a real MCP client (`initialize`, `tools/list`, `tools/call`). Alexa+ is still the LLM.
 
 ```powershell
 cd C:\Users\cclot\doc-ai

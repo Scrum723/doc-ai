@@ -1,21 +1,25 @@
 # Doc AI demo script (≤ 3:00, English)
 
-0:00 Problem: weather apps are dashboards, not a conversation you can ask about history and sensors.
+Full AWS verify steps, Devpost checklist, and winning shot list: **`docs/WINNING-SUBMISSION.md`**.
 
-0:15 Terminal: `npm run dev`. Show `Doc AI listening` and MCP POST+GET `/mcp`.
+**Record the live AWS sim (preferred):**  
+https://cub7un5uilxww5uvdef6vjbkqm0ltpiq.lambda-url.us-east-1.on.aws/  
+Landscape browser. Do **not** ask a home Echo to open DOC Weather.
 
-0:35 Smoke or playground **List tools** conceptually: six tools.
+0:00 Hook: almost freezing — do I leave the hose out?
 
-0:50 Ask “What's the weather in Rochester?” — live Open-Meteo or seed, spoken sentence.
+0:12 Health + MCP wire: `initialize` / `tools/list` on Lambda. Say Alexa+ is the LLM; Doc AI is MCP tools.
 
-1:10 Alerts + 3-day forecast.
+0:32 “What's the weather in Rochester?” — big card + spoken line.
 
-1:30 Historical “2026-09-15 to 2026-09-18.”
+0:55 “Should I leave the hose out?” — yes / caution / no. Optional grill.
 
-1:50 `list_iot_sources` — say **simulated** nodes.
+1:25 “Watch Rochester for freeze.” Confirm chip → `watch_conditions`. Briefing includes freeze watch.
 
-2:10 Alexa+ sim: “Give me a briefing.” `chat_summary` spoken, no markdown.
+1:55 IoT is **simulated** (say that). Optional: list sensors.
 
-2:40 README MIT, Alexa+ only, GitHub.
+2:15 Optional cut to https://whatsupdoc.fyi/doc — Talk + globe.
 
-2:55 Thank you.
+2:35 Repo Scrum723/doc-ai MIT. Thanks.
+
+Keep under 2:50 so judges never hit the 3:00 cutoff.

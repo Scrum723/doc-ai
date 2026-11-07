@@ -5,6 +5,14 @@ var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
+var __esm = (fn, res, err2) => function __init() {
+  if (err2) throw err2[0];
+  try {
+    return fn && (res = (0, fn[__getOwnPropNames(fn)[0]])(fn = 0)), res;
+  } catch (e) {
+    throw err2 = [e], e;
+  }
+};
 var __commonJS = (cb, mod) => function __require() {
   try {
     return mod || (0, cb[__getOwnPropNames(cb)[0]])((mod = { exports: {} }).exports, mod), mod.exports;
@@ -38,9 +46,9 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var require_finish = __commonJS({
   "node_modules/serverless-http/lib/finish.js"(exports2, module2) {
     "use strict";
-    module2.exports = async function finish(item, transform, ...details) {
+    module2.exports = async function finish(item2, transform, ...details) {
       await new Promise((resolve, reject) => {
-        if (item.finished || item.complete) {
+        if (item2.finished || item2.complete) {
           resolve();
           return;
         }
@@ -50,25 +58,25 @@ var require_finish = __commonJS({
             return;
           }
           finished = true;
-          item.removeListener("error", done);
-          item.removeListener("end", done);
-          item.removeListener("finish", done);
+          item2.removeListener("error", done);
+          item2.removeListener("end", done);
+          item2.removeListener("finish", done);
           if (err2) {
             reject(err2);
           } else {
             resolve();
           }
         }
-        item.once("error", done);
-        item.once("end", done);
-        item.once("finish", done);
+        item2.once("error", done);
+        item2.once("end", done);
+        item2.once("finish", done);
       });
       if (typeof transform === "function") {
-        await transform(item, ...details);
+        await transform(item2, ...details);
       } else if (typeof transform === "object" && transform !== null) {
-        Object.assign(item, transform);
+        Object.assign(item2, transform);
       }
-      return item;
+      return item2;
     };
   }
 });
@@ -18777,8 +18785,8 @@ var require_utils2 = __commonJS({
     })();
     var compactQueue = function compactQueue2(queue) {
       while (queue.length > 1) {
-        var item = queue.pop();
-        var obj = item.obj[item.prop];
+        var item2 = queue.pop();
+        var obj = item2.obj[item2.prop];
         if (isArray(obj)) {
           var compacted = [];
           for (var j = 0; j < obj.length; ++j) {
@@ -18786,7 +18794,7 @@ var require_utils2 = __commonJS({
               compacted[compacted.length] = obj[j];
             }
           }
-          item.obj[item.prop] = compacted;
+          item2.obj[item2.prop] = compacted;
         }
       }
     };
@@ -18864,16 +18872,16 @@ var require_utils2 = __commonJS({
         mergeTarget = arrayToObject(target, options);
       }
       if (isArray(target) && isArray(source)) {
-        source.forEach(function(item, i) {
+        source.forEach(function(item2, i) {
           if (has.call(target, i)) {
             var targetItem = target[i];
-            if (targetItem && typeof targetItem === "object" && item && typeof item === "object") {
-              target[i] = merge2(targetItem, item, options);
+            if (targetItem && typeof targetItem === "object" && item2 && typeof item2 === "object") {
+              target[i] = merge2(targetItem, item2, options);
             } else {
-              target[target.length] = item;
+              target[target.length] = item2;
             }
           } else {
-            target[i] = item;
+            target[i] = item2;
           }
         });
         if (options && typeof options.arrayLimit === "number" && target.length > options.arrayLimit) {
@@ -18977,8 +18985,8 @@ var require_utils2 = __commonJS({
       var queue = [{ obj: { o: value }, prop: "o" }];
       var refs = getSideChannel();
       for (var i = 0; i < queue.length; ++i) {
-        var item = queue[i];
-        var obj = item.obj[item.prop];
+        var item2 = queue[i];
+        var obj = item2.obj[item2.prop];
         var keys = Object.keys(obj);
         for (var j = 0; j < keys.length; ++j) {
           var key = keys[j];
@@ -25150,30 +25158,7 @@ var require_express2 = __commonJS({
   }
 });
 
-// server/lambda.ts
-var lambda_exports = {};
-__export(lambda_exports, {
-  handler: () => handler
-});
-module.exports = __toCommonJS(lambda_exports);
-var import_serverless_http = __toESM(require_serverless_http(), 1);
-
-// server/lambdaApp.ts
-var import_node_fs3 = require("node:fs");
-var import_node_path3 = require("node:path");
-var import_cors = __toESM(require_lib(), 1);
-var import_express = __toESM(require_express2(), 1);
-
 // data/locations.ts
-var import_node_fs = require("node:fs");
-var import_node_path = require("node:path");
-var SEED_CANDIDATES = [
-  (0, import_node_path.join)(process.cwd(), "data", "seed.json"),
-  (0, import_node_path.join)(process.cwd(), "seed.json"),
-  (0, import_node_path.join)("/var/task", "data", "seed.json"),
-  (0, import_node_path.join)("/var/task", "seed.json")
-];
-var cached = null;
 function seedPath() {
   for (const p of SEED_CANDIDATES) {
     try {
@@ -25210,12 +25195,23 @@ function resolveLocation(input) {
   }
   return data.locations.rochester;
 }
+var import_node_fs, import_node_path, SEED_CANDIDATES, cached;
+var init_locations = __esm({
+  "data/locations.ts"() {
+    "use strict";
+    import_node_fs = require("node:fs");
+    import_node_path = require("node:path");
+    SEED_CANDIDATES = [
+      (0, import_node_path.join)(process.cwd(), "data", "seed.json"),
+      (0, import_node_path.join)(process.cwd(), "seed.json"),
+      (0, import_node_path.join)("/var/task", "data", "seed.json"),
+      (0, import_node_path.join)("/var/task", "seed.json")
+    ];
+    cached = null;
+  }
+});
 
 // data/db.ts
-var import_node_fs2 = require("node:fs");
-var import_node_path2 = require("node:path");
-var { DatabaseSync } = process.getBuiltinModule("node:sqlite");
-var db = null;
 function dbPath() {
   return process.env.DOC_AI_DB || (0, import_node_path2.join)(process.env.AWS_LAMBDA_FUNCTION_NAME ? "/tmp" : process.cwd(), "data", "doc-ai.sqlite");
 }
@@ -25249,8 +25245,68 @@ function getDb() {
       lon REAL,
       unit TEXT
     );
+    CREATE TABLE IF NOT EXISTS watches (
+      location_key TEXT NOT NULL,
+      hazard TEXT NOT NULL,
+      status TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      confirmed_at TEXT,
+      PRIMARY KEY (location_key, hazard)
+    );
   `);
   return db;
+}
+function watchFromRow(row) {
+  return {
+    locationKey: row.location_key,
+    hazard: row.hazard,
+    status: row.status,
+    createdAt: row.created_at,
+    confirmedAt: row.confirmed_at ?? null
+  };
+}
+function proposeWatch(locationKey, hazard) {
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  getDb().prepare(
+    `INSERT INTO watches (location_key, hazard, status, created_at, confirmed_at)
+       VALUES (?, ?, 'pending', ?, NULL)
+       ON CONFLICT(location_key, hazard) DO UPDATE SET
+         status = CASE WHEN watches.status = 'active' THEN 'active' ELSE 'pending' END,
+         created_at = excluded.created_at`
+  ).run(locationKey, hazard, now);
+  return getWatch(locationKey, hazard);
+}
+function confirmWatch(locationKey, hazard) {
+  const now = (/* @__PURE__ */ new Date()).toISOString();
+  const existing = getWatch(locationKey, hazard);
+  if (!existing) {
+    getDb().prepare(
+      `INSERT INTO watches (location_key, hazard, status, created_at, confirmed_at)
+         VALUES (?, ?, 'active', ?, ?)`
+    ).run(locationKey, hazard, now, now);
+  } else {
+    getDb().prepare(
+      `UPDATE watches SET status = 'active', confirmed_at = ? WHERE location_key = ? AND hazard = ?`
+    ).run(now, locationKey, hazard);
+  }
+  return getWatch(locationKey, hazard);
+}
+function getWatch(locationKey, hazard) {
+  const row = getDb().prepare(`SELECT * FROM watches WHERE location_key = ? AND hazard = ?`).get(locationKey, hazard);
+  return row ? watchFromRow(row) : null;
+}
+function listWatches(locationKey, status) {
+  const d = getDb();
+  if (locationKey && status) {
+    return d.prepare(`SELECT * FROM watches WHERE location_key = ? AND status = ?`).all(locationKey, status).map(watchFromRow);
+  }
+  if (locationKey) {
+    return d.prepare(`SELECT * FROM watches WHERE location_key = ?`).all(locationKey).map(watchFromRow);
+  }
+  if (status) {
+    return d.prepare(`SELECT * FROM watches WHERE status = ?`).all(status).map(watchFromRow);
+  }
+  return d.prepare(`SELECT * FROM watches`).all().map(watchFromRow);
 }
 function upsertReading(r) {
   const d = getDb();
@@ -25332,11 +25388,18 @@ function fromRow(row) {
     extra: row.extra_json ? JSON.parse(row.extra_json) : {}
   };
 }
+var import_node_fs2, import_node_path2, DatabaseSync, db;
+var init_db = __esm({
+  "data/db.ts"() {
+    "use strict";
+    import_node_fs2 = require("node:fs");
+    import_node_path2 = require("node:path");
+    ({ DatabaseSync } = process.getBuiltinModule("node:sqlite"));
+    db = null;
+  }
+});
 
 // data/normalize.ts
-var SOURCE_OPEN_METEO = "open-meteo";
-var SOURCE_NWS = "nws";
-var SOURCE_IOT = "iot";
 function cToF(c) {
   if (c == null || Number.isNaN(c)) return null;
   return Math.round(c * 9 / 5 + 32);
@@ -25357,7 +25420,7 @@ function normalizeOpenMeteoCurrent(locationKey, payload) {
     extra: { host: "api.open-meteo.com" }
   };
 }
-function normalizeOpenMeteoForecastDay(locationKey, date, tempF, precipIn, windMph, weatherCode) {
+function normalizeOpenMeteoForecastDay(locationKey, date, tempF, precipIn, windMph, weatherCode, minTempF) {
   return {
     locationKey,
     source: SOURCE_OPEN_METEO,
@@ -25368,7 +25431,10 @@ function normalizeOpenMeteoForecastDay(locationKey, date, tempF, precipIn, windM
     windMph,
     precipIn,
     text: weatherCodeText(weatherCode),
-    extra: { host: "api.open-meteo.com" }
+    extra: {
+      host: "api.open-meteo.com",
+      minTempF: minTempF != null ? Math.round(Number(minTempF)) : null
+    }
   };
 }
 function normalizeNwsAlert(locationKey, alert) {
@@ -25417,6 +25483,15 @@ function weatherCodeText(code) {
   if (code <= 99) return "Thunderstorms";
   return "Mixed";
 }
+var SOURCE_OPEN_METEO, SOURCE_NWS, SOURCE_IOT;
+var init_normalize = __esm({
+  "data/normalize.ts"() {
+    "use strict";
+    SOURCE_OPEN_METEO = "open-meteo";
+    SOURCE_NWS = "nws";
+    SOURCE_IOT = "iot";
+  }
+});
 
 // data/seed.ts
 function seedDatabase() {
@@ -25466,7 +25541,7 @@ function seedDatabase() {
           windMph: d.windMph,
           precipIn: d.precipIn,
           text: d.text,
-          extra: { seeded: true, host: "api.open-meteo.com" }
+          extra: { seeded: true, host: "api.open-meteo.com", minTempF: d.minTempF ?? null }
         };
       })
     );
@@ -25505,14 +25580,21 @@ function seedDatabase() {
   }
   console.log("[seed] SQLite ready with Open-Meteo, NWS, and IoT rows");
 }
-var isMain = process.argv[1]?.includes("seed");
-if (isMain) seedDatabase();
+var isMain;
+var init_seed = __esm({
+  "data/seed.ts"() {
+    "use strict";
+    init_locations();
+    init_db();
+    init_normalize();
+    isMain = process.argv[1]?.includes("seed");
+    if (isMain) seedDatabase();
+  }
+});
 
 // data/openmeteo.ts
-var FORECAST_HOST = "https://api.open-meteo.com";
-var ARCHIVE_HOST = "https://archive-api.open-meteo.com";
 async function fetchOpenMeteoCurrentAndForecast(lat, lon, locationKey, days = 7) {
-  const url = `${FORECAST_HOST}/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code&daily=temperature_2m_max,precipitation_sum,wind_speed_10m_max,weather_code&forecast_days=${Math.min(16, Math.max(1, days))}&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
+  const url = `${FORECAST_HOST}/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,weather_code&forecast_days=${Math.min(16, Math.max(1, days))}&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
   console.log(`[Open-Meteo] GET ${url}`);
   try {
     const res = await fetch(url, { headers: { Accept: "application/json" } });
@@ -25530,7 +25612,8 @@ async function fetchOpenMeteoCurrentAndForecast(lat, lon, locationKey, days = 7)
           daily.temperature_2m_max?.[i] ?? null,
           daily.precipitation_sum?.[i] ?? null,
           daily.wind_speed_10m_max?.[i] ?? null,
-          daily.weather_code?.[i]
+          daily.weather_code?.[i],
+          daily.temperature_2m_min?.[i] ?? null
         )
       );
     }
@@ -25584,9 +25667,17 @@ async function fetchOpenMeteoHistorical(lat, lon, locationKey, start, end) {
     return { readings: [], error: message };
   }
 }
+var FORECAST_HOST, ARCHIVE_HOST;
+var init_openmeteo = __esm({
+  "data/openmeteo.ts"() {
+    "use strict";
+    init_normalize();
+    FORECAST_HOST = "https://api.open-meteo.com";
+    ARCHIVE_HOST = "https://archive-api.open-meteo.com";
+  }
+});
 
 // data/nws.ts
-var BASE = "https://api.weather.gov";
 function userAgent() {
   return process.env.NWS_USER_AGENT || "DocAI/1.0 (contact: cclot1@brockport.edu; https://github.com/Scrum723/doc-ai)";
 }
@@ -25610,6 +25701,14 @@ async function fetchNwsAlerts(lat, lon, locationKey) {
     return { readings: [], error: message };
   }
 }
+var BASE;
+var init_nws = __esm({
+  "data/nws.ts"() {
+    "use strict";
+    init_normalize();
+    BASE = "https://api.weather.gov";
+  }
+});
 
 // data/iot.ts
 function registerIotFromSeed() {
@@ -25641,9 +25740,16 @@ function tickIot(locationKey) {
   }
   return out;
 }
+var init_iot = __esm({
+  "data/iot.ts"() {
+    "use strict";
+    init_locations();
+    init_normalize();
+    init_db();
+  }
+});
 
 // data/ingest.ts
-var seeded = false;
 function ensureSeeded() {
   if (seeded) return;
   seedDatabase();
@@ -25677,9 +25783,20 @@ async function refreshHistorical(loc, start, end) {
   for (const r of hist.readings) upsertReading(r);
   return {};
 }
+var seeded;
+var init_ingest = __esm({
+  "data/ingest.ts"() {
+    "use strict";
+    init_seed();
+    init_openmeteo();
+    init_nws();
+    init_iot();
+    init_db();
+    seeded = false;
+  }
+});
 
 // agent/voice.ts
-var MD = /[`*_#\[\]()>~|]/g;
 function spoken(text) {
   let s = text.replace(MD, " ");
   s = s.replace(/\s+/g, " ").trim();
@@ -25690,8 +25807,230 @@ function spoken(text) {
 function joinSpoken(parts) {
   return spoken(parts.filter(Boolean).join(" "));
 }
+var MD;
+var init_voice = __esm({
+  "agent/voice.ts"() {
+    "use strict";
+    MD = /[`*_#\[\]()>~|]/g;
+  }
+});
+
+// agent/shouldI.ts
+function parseActivity(raw) {
+  const s = (raw || "").toLowerCase();
+  for (const p of ACTIVITY_PATTERNS) {
+    if (p.re.test(s)) return p.id;
+  }
+  return "general";
+}
+function joinedAlerts(events) {
+  return events.join(" ").toLowerCase();
+}
+function freezeBand(facts) {
+  const blob = `${joinedAlerts(facts.alertEvents)} ${facts.forecastTexts.join(" ")}`;
+  if (/hard freeze|freeze warning|frost advisory|ice storm/.test(blob)) return "likely";
+  const overnight = facts.minTempF ?? (facts.tempF != null ? facts.tempF - 10 : null);
+  if (overnight != null && overnight <= 32) return "likely";
+  if (facts.tempF != null && facts.tempF <= 32) return "likely";
+  if (overnight != null && overnight <= 36) return "near";
+  if (facts.tempF != null && facts.tempF <= 35) return "near";
+  if (/\bfrost\b|\bfreeze\b/.test(blob) && (overnight == null || overnight <= 40)) return "near";
+  return "none";
+}
+function rainSoon(facts) {
+  const precip = facts.forecastPrecip.slice(0, 2).reduce((a, b) => a + (b || 0), 0) + (facts.precipIn || 0);
+  if (precip >= 0.15) return true;
+  const blob = `${facts.conditionText} ${facts.forecastTexts.slice(0, 2).join(" ")}`.toLowerCase();
+  return /rain|shower|storm|thunder|snow/.test(blob);
+}
+function windy(facts) {
+  if ((facts.windMph ?? 0) >= 25) return true;
+  return /wind|gale/.test(joinedAlerts(facts.alertEvents));
+}
+function pack(activity, decision, title, reason, action) {
+  const spokenLine = spoken(`${title} ${reason} ${action}`);
+  return {
+    activity,
+    decision,
+    title,
+    reason,
+    action,
+    spoken: spokenLine,
+    card: {
+      headline: title,
+      supporting: reason,
+      chip: decision === "yes" ? "Go ahead" : decision === "caution" ? "Caution" : "Don't",
+      decision,
+      action
+    }
+  };
+}
+function decideShouldI(activity, facts) {
+  const freeze = freezeBand(facts);
+  const rain = rainSoon(facts);
+  const wind = windy(facts);
+  const loc = facts.locationLabel;
+  const overnight = facts.minTempF ?? facts.tempF;
+  if (activity === "leave_hose") {
+    if (freeze === "likely") {
+      return pack(
+        activity,
+        "no",
+        "No.",
+        `Freeze risk in ${loc}. Overnight low around ${overnight ?? "freezing"} degrees.`,
+        "Disconnect and drain the hose."
+      );
+    }
+    if (freeze === "near") {
+      return pack(
+        activity,
+        "caution",
+        "Caution.",
+        `Temps in ${loc} are close to freezing.`,
+        "Bring the hose in if the overnight low drops."
+      );
+    }
+    return pack(
+      activity,
+      "yes",
+      "Yes.",
+      `Overnight lows in ${loc} stay above freezing.`,
+      "You can leave the hose connected."
+    );
+  }
+  if (activity === "cover_grill") {
+    if (rain || wind) {
+      return pack(
+        activity,
+        "yes",
+        "Yes.",
+        `${rain ? "Rain" : "Wind"} is in the ${loc} outlook.`,
+        "Cover the grill."
+      );
+    }
+    return pack(
+      activity,
+      "no",
+      "No need.",
+      `Skies stay mostly dry in ${loc}.`,
+      "Leave the grill uncovered."
+    );
+  }
+  if (activity === "leave_boat") {
+    if (wind || rain || freeze === "likely") {
+      return pack(
+        activity,
+        "no",
+        "No.",
+        `Wind, rain, or freeze is in the ${loc} outlook.`,
+        "Cover the boat and check lines."
+      );
+    }
+    return pack(
+      activity,
+      "yes",
+      "Yes.",
+      `Conditions look workable on the water near ${loc}.`,
+      "Still check lines before you leave."
+    );
+  }
+  if (activity === "walk_dog") {
+    const severe = /warning|tornado|thunder|blizzard|extreme/.test(joinedAlerts(facts.alertEvents));
+    if (severe || freeze === "likely" || facts.tempF != null && facts.tempF >= 92) {
+      return pack(
+        activity,
+        "no",
+        "No.",
+        `Weather in ${loc} is too rough for a long walk.`,
+        "Keep the walk short or wait it out."
+      );
+    }
+    if (wind || rain || freeze === "near") {
+      return pack(
+        activity,
+        "caution",
+        "Caution.",
+        `It is ${facts.conditionText.toLowerCase() || "unsettled"} in ${loc}.`,
+        "A short walk is fine. Skip the long loop."
+      );
+    }
+    return pack(
+      activity,
+      "yes",
+      "Yes.",
+      `It is about ${facts.tempF ?? "unknown"} degrees in ${loc}.`,
+      "Good window for a walk."
+    );
+  }
+  if (activity === "drive") {
+    const ice = /ice|winter|blizzard|flood|visibility/.test(joinedAlerts(facts.alertEvents));
+    if (ice || freeze === "likely") {
+      return pack(
+        activity,
+        "caution",
+        "Caution.",
+        `Winter or low-visibility risk is on the ${loc} board.`,
+        "Leave extra time and watch the roads."
+      );
+    }
+    return pack(
+      activity,
+      "yes",
+      "Yes.",
+      `No winter travel alerts stored for ${loc}.`,
+      "Drive as usual."
+    );
+  }
+  if (freeze === "likely" || /warning/.test(joinedAlerts(facts.alertEvents))) {
+    return pack(
+      activity,
+      "caution",
+      "Caution.",
+      `Active weather in ${loc} needs a look before you head out.`,
+      "Ask about the hose, the grill, or a freeze watch."
+    );
+  }
+  return pack(
+    activity,
+    "yes",
+    "Yes.",
+    `Nothing blocking household plans in ${loc} right now.`,
+    "Ask should I leave the hose out, or should I cover the grill, for a specific call."
+  );
+}
+var ACTIVITY_PATTERNS;
+var init_shouldI = __esm({
+  "agent/shouldI.ts"() {
+    "use strict";
+    init_voice();
+    ACTIVITY_PATTERNS = [
+      { id: "leave_hose", re: /hose|spigot|faucet|pipe|outdoor tap/ },
+      { id: "cover_grill", re: /grill|bbq|barbecue/ },
+      { id: "walk_dog", re: /dog|walk the|pet/ },
+      { id: "drive", re: /drive|commute|road|car/ },
+      { id: "leave_boat", re: /boat|dock|launch|cover the boat/ }
+    ];
+  }
+});
 
 // agent/orchestrator.ts
+function card(partial) {
+  return partial;
+}
+function overnightLow(locationKey) {
+  const days = listByKind(locationKey, "forecast", 3);
+  const mins = days.map((r) => {
+    const extraMin = r.extra?.minTempF;
+    return extraMin ?? null;
+  }).filter((n) => n != null);
+  if (mins.length) return Math.min(...mins);
+  const highs = days.map((r) => r.tempF).filter((n) => n != null);
+  if (!highs.length) return null;
+  return Math.min(...highs) - 10;
+}
+function alertEvents(locationKey) {
+  return listByKind(locationKey, "alert", 20).map((r) => String(r.extra?.event || r.text));
+}
 function parseRange(dateRange) {
   const end = /* @__PURE__ */ new Date();
   const start = /* @__PURE__ */ new Date();
@@ -25714,7 +26053,8 @@ async function getCurrentWeather(args) {
   if (!row) {
     return {
       spoken: spoken(`I could not find current weather for ${loc.label}. ${refresh.errors.join(" ")}`),
-      data: { error: true, location: loc, errors: refresh.errors }
+      data: { error: true, location: loc, errors: refresh.errors },
+      card: card({ headline: "\u2014", supporting: loc.label })
     };
   }
   const line = joinSpoken([
@@ -25725,7 +26065,12 @@ async function getCurrentWeather(args) {
   ]);
   return {
     spoken: line,
-    data: { location: loc, reading: row, sources: distinctSources(), liveAttempt: refresh }
+    data: { location: loc, reading: row, sources: distinctSources(), liveAttempt: refresh },
+    card: card({
+      headline: row.tempF != null ? `${row.tempF}\xB0` : "\u2014",
+      supporting: `${row.text} \xB7 ${loc.label}`,
+      chip: row.windMph != null ? `${row.windMph} mph` : void 0
+    })
   };
 }
 async function getForecast(args) {
@@ -25737,7 +26082,8 @@ async function getForecast(args) {
   if (!rows.length) {
     return {
       spoken: spoken(`I do not have a forecast stored for ${loc.label} yet.`),
-      data: { error: true, location: loc }
+      data: { error: true, location: loc },
+      card: card({ headline: "Forecast", supporting: loc.label })
     };
   }
   const first = rows[0];
@@ -25746,7 +26092,15 @@ async function getForecast(args) {
     `${days} day forecast for ${loc.label} starts ${first.text.toLowerCase()} near ${first.tempF} degrees.`,
     rest.length ? `Next days: ${rest.join(". ")}.` : ""
   ]);
-  return { spoken: line, data: { location: loc, days, forecast: rows } };
+  return {
+    spoken: line,
+    data: { location: loc, days, forecast: rows },
+    card: card({
+      headline: first.tempF != null ? `${first.tempF}\xB0` : "Forecast",
+      supporting: `${days}-day outlook \xB7 ${loc.label}`,
+      chip: first.text
+    })
+  };
 }
 async function getAlerts(args) {
   ensureSeeded();
@@ -25756,13 +26110,19 @@ async function getAlerts(args) {
   if (!rows.length) {
     return {
       spoken: spoken(`There are no active weather alerts stored for ${loc.label} right now.`),
-      data: { location: loc, alerts: [], count: 0 }
+      data: { location: loc, alerts: [], count: 0 },
+      card: card({ headline: "No alerts", supporting: loc.label, chip: "Clear" })
     };
   }
   const events = rows.map((r) => r.extra?.event || r.text).slice(0, 3);
   return {
     spoken: spoken(`${rows.length} alert${rows.length === 1 ? "" : "s"} for ${loc.label}. ${events.join(". ")}.`),
-    data: { location: loc, alerts: rows, count: rows.length }
+    data: { location: loc, alerts: rows, count: rows.length },
+    card: card({
+      headline: String(events[0] || "Alert"),
+      supporting: `${rows.length} active \xB7 ${loc.label}`,
+      chip: "NWS"
+    })
   };
 }
 async function getHistorical(args) {
@@ -25776,7 +26136,8 @@ async function getHistorical(args) {
       spoken: spoken(
         `No historical readings for ${loc.label} between ${range.start} and ${range.end}. Seed covers mid September 2026 for Rochester.`
       ),
-      data: { location: loc, range, readings: [] }
+      data: { location: loc, range, readings: [] },
+      card: card({ headline: "No history", supporting: `${range.start} to ${range.end}` })
     };
   }
   const temps = rows.map((r) => r.tempF).filter((t) => t != null);
@@ -25785,7 +26146,11 @@ async function getHistorical(args) {
     spoken: spoken(
       `I have ${rows.length} stored readings for ${loc.label} from ${range.start} to ${range.end}. Average high around ${avg ?? "unknown"} degrees.`
     ),
-    data: { location: loc, range, readings: rows, sources: [...new Set(rows.map((r) => r.source))] }
+    data: { location: loc, range, readings: rows, sources: [...new Set(rows.map((r) => r.source))] },
+    card: card({
+      headline: avg != null ? `${avg}\xB0` : "History",
+      supporting: `${rows.length} readings \xB7 ${range.start} to ${range.end}`
+    })
   };
 }
 async function listIotSourcesTool(args) {
@@ -25797,8 +26162,39 @@ async function listIotSourcesTool(args) {
     spoken: spoken(
       `Doc AI is watching ${sources.length} simulated IoT nodes${loc ? " near " + loc.label : ""}. ${names}. These are labeled simulations, not a live worldwide camera weather mesh.`
     ),
-    data: { sources, location: loc, simulated: true }
+    data: { sources, location: loc, simulated: true },
+    card: card({
+      headline: `${sources.length} nodes`,
+      supporting: "Simulated IoT \xB7 not a live camera mesh",
+      chip: "MOCK"
+    })
   };
+}
+function watchLine(locLabel, locationKey, watches) {
+  if (!watches.length) return "";
+  const freeze = watches.find((w) => w.hazard === "freeze");
+  const others = watches.filter((w) => w.hazard !== "freeze");
+  const parts = [];
+  if (freeze) {
+    const low = overnightLow(locationKey);
+    const events = alertEvents(locationKey).join(" ").toLowerCase();
+    const nwsFreeze = /freeze|frost/.test(events);
+    if (freeze.status === "pending") {
+      parts.push(`A freeze watch for ${locLabel} is waiting for your confirm.`);
+    } else if (nwsFreeze) {
+      parts.push(`Freeze watch is active. NWS has a freeze or frost product for ${locLabel}.`);
+    } else {
+      parts.push(
+        `Freeze watch is active for ${locLabel}. Overnight low around ${low ?? "unknown"} degrees. No freeze warning from NWS right now.`
+      );
+    }
+  }
+  for (const w of others) {
+    parts.push(
+      w.status === "pending" ? `A ${w.hazard} watch is waiting for your confirm.` : `${w.hazard} watch is active.`
+    );
+  }
+  return parts.join(" ");
 }
 async function chatSummary(args) {
   const loc = resolveLocation(args);
@@ -25806,13 +26202,17 @@ async function chatSummary(args) {
   const forecast = await getForecast({ location: loc.key, days: 3 });
   const alerts = await getAlerts({ location: loc.key });
   const iot = await listIotSourcesTool({ location: loc.key });
+  const watches = listWatches(loc.key);
+  const watchSpoken = watchLine(loc.label, loc.key, watches);
   const briefing = joinSpoken([
     `Here is your Doc AI briefing for ${loc.label}.`,
     current.spoken,
     forecast.spoken,
     alerts.spoken,
+    watchSpoken,
     iot.spoken
   ]);
+  const temp = current.data.reading?.tempF;
   return {
     spoken: briefing,
     data: {
@@ -25820,20 +26220,118 @@ async function chatSummary(args) {
       current: current.data,
       forecast: forecast.data,
       alerts: alerts.data,
-      iot: iot.data
-    }
+      iot: iot.data,
+      watches
+    },
+    card: card({
+      headline: temp != null ? `${temp}\xB0` : "Briefing",
+      supporting: loc.label,
+      chip: watches.some((w) => w.status === "active") ? "Watch on" : watches.some((w) => w.status === "pending") ? "Confirm watch" : alerts.data.count > 0 ? "Alerts" : "Clear"
+    })
   };
 }
+function parseHazard(raw) {
+  const s = (raw || "freeze").toLowerCase();
+  if (/wind|gale/.test(s)) return "wind";
+  if (/flood/.test(s)) return "flood";
+  if (/rain|storm/.test(s)) return "rain";
+  return "freeze";
+}
+async function watchConditions(args) {
+  ensureSeeded();
+  const loc = resolveLocation(args);
+  const hazard = parseHazard(args.hazard);
+  const confirmed = args.confirm === true || args.confirm === "true";
+  const existing = listWatches(loc.key).find((w) => w.hazard === hazard);
+  if (!confirmed && existing?.status === "active") {
+    return {
+      spoken: spoken(`${hazard} watch is already on for ${loc.label}. It is included in the briefing.`),
+      data: { location: loc, watch: existing, confirmed: true },
+      card: card({
+        headline: `${hazard} watch on`,
+        supporting: loc.label,
+        chip: "Active"
+      })
+    };
+  }
+  if (confirmed) {
+    const row2 = confirmWatch(loc.key, hazard);
+    const low = overnightLow(loc.key);
+    return {
+      spoken: spoken(
+        `${hazard} watch is on for ${loc.label}. I will include it in the next briefing. Overnight low around ${low ?? "unknown"} degrees.`
+      ),
+      data: { location: loc, watch: row2, confirmed: true },
+      card: card({
+        headline: `${hazard} watch on`,
+        supporting: loc.label,
+        chip: "Active",
+        action: "Included in briefings"
+      })
+    };
+  }
+  const row = proposeWatch(loc.key, hazard);
+  return {
+    spoken: spoken(
+      `I will include ${hazard} in the next briefing for ${loc.label}. Confirm?`
+    ),
+    data: { location: loc, watch: row, needsConfirm: true, proposed: { location: loc.key, hazard } },
+    card: card({
+      headline: `Watch ${hazard}?`,
+      supporting: loc.label,
+      chip: "Pending",
+      action: "Confirm",
+      needsConfirm: true
+    })
+  };
+}
+function factsFor(locationKey, locationLabel) {
+  const current = latest(locationKey, "current");
+  const forecast = listByKind(locationKey, "forecast", 3);
+  return {
+    locationLabel,
+    tempF: current?.tempF ?? null,
+    minTempF: overnightLow(locationKey),
+    windMph: current?.windMph ?? null,
+    precipIn: current?.precipIn ?? null,
+    conditionText: current?.text || "",
+    forecastTexts: forecast.map((r) => r.text),
+    forecastPrecip: forecast.map((r) => r.precipIn ?? 0),
+    alertEvents: alertEvents(locationKey)
+  };
+}
+async function shouldI(args) {
+  ensureSeeded();
+  const loc = resolveLocation(args);
+  await refreshLocation(loc);
+  const activity = parseActivity(args.activity);
+  const decided = decideShouldI(activity, factsFor(loc.key, loc.label));
+  return {
+    spoken: decided.spoken,
+    data: {
+      location: loc,
+      activity: decided.activity,
+      decision: decided.decision,
+      title: decided.title,
+      reason: decided.reason,
+      action: decided.action,
+      card: decided.card
+    },
+    card: decided.card
+  };
+}
+var init_orchestrator = __esm({
+  "agent/orchestrator.ts"() {
+    "use strict";
+    init_locations();
+    init_db();
+    init_ingest();
+    init_shouldI();
+    init_voice();
+  }
+});
 
 // agent/tools.ts
-var TOOL_NAMES = [
-  "get_current_weather",
-  "get_forecast",
-  "get_alerts",
-  "get_historical",
-  "list_iot_sources",
-  "chat_summary"
-];
 async function runTool(name, args) {
   switch (name) {
     case "get_current_weather":
@@ -25848,13 +26346,550 @@ async function runTool(name, args) {
       return listIotSourcesTool(args);
     case "chat_summary":
       return chatSummary(args);
+    case "should_i":
+      return shouldI(args);
+    case "watch_conditions":
+      return watchConditions(args);
     default:
       throw new Error(`Unknown tool ${name}`);
   }
 }
+var TOOL_CATALOG, TOOL_NAMES;
+var init_tools = __esm({
+  "agent/tools.ts"() {
+    "use strict";
+    init_orchestrator();
+    TOOL_CATALOG = [
+      {
+        name: "get_current_weather",
+        description: "Current weather for a location. Defaults to Rochester, NY.",
+        inputSchema: {
+          type: "object",
+          properties: { location: { type: "string", description: "City or location key" } }
+        }
+      },
+      {
+        name: "get_forecast",
+        description: "Daily forecast. location plus days (default 3).",
+        inputSchema: {
+          type: "object",
+          properties: {
+            location: { type: "string" },
+            days: { type: "number" }
+          }
+        }
+      },
+      {
+        name: "get_alerts",
+        description: "Active NWS weather alerts for a location.",
+        inputSchema: {
+          type: "object",
+          properties: { location: { type: "string" } }
+        }
+      },
+      {
+        name: "get_historical",
+        description: "Historical stored readings. date_range like 2026-09-15 to 2026-09-18.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            location: { type: "string" },
+            date_range: { type: "string" }
+          }
+        }
+      },
+      {
+        name: "list_iot_sources",
+        description: "List simulated IoT weather nodes Doc AI is absorbing.",
+        inputSchema: {
+          type: "object",
+          properties: { location: { type: "string" } }
+        }
+      },
+      {
+        name: "chat_summary",
+        description: "Spoken briefing combining current, forecast, alerts, IoT, and any confirmed watches.",
+        inputSchema: {
+          type: "object",
+          properties: { location: { type: "string" } }
+        }
+      },
+      {
+        name: "should_i",
+        description: "Finish a household weather job: should I leave the hose out, cover the grill, walk the dog, drive, or leave the boat. Returns yes, caution, or no with one reason.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            location: { type: "string" },
+            activity: { type: "string", description: "What the customer wants to do" }
+          }
+        }
+      },
+      {
+        name: "watch_conditions",
+        description: "Propose or confirm a condition watch (default freeze). First call asks Confirm. confirm=true stores the watch in SQLite and includes it in chat_summary.",
+        inputSchema: {
+          type: "object",
+          properties: {
+            location: { type: "string" },
+            hazard: { type: "string" },
+            confirm: { type: "boolean" }
+          }
+        }
+      }
+    ];
+    TOOL_NAMES = TOOL_CATALOG.map((t) => t.name);
+  }
+});
+
+// agent/visuals.ts
+function nowIso() {
+  return (/* @__PURE__ */ new Date()).toISOString();
+}
+function bust(url) {
+  const sep = url.includes("?") ? "&" : "?";
+  return `${url}${sep}t=${Date.now()}`;
+}
+function item(partial) {
+  const v = {
+    caption: null,
+    source: null,
+    url: null,
+    urls: null,
+    chart_kind: null,
+    chart_data: null,
+    lat: null,
+    lon: null,
+    zoom: null,
+    metrics: null,
+    href: null,
+    fetched_at: nowIso(),
+    ...partial
+  };
+  if (v.url) v.url = bust(v.url);
+  if (v.urls) v.urls = v.urls.map(bust);
+  return v;
+}
+function detectProducts(message) {
+  const text = message || "";
+  const found = [];
+  for (const a of ALIASES) {
+    if (a.re.test(text) && !found.includes(a.product)) found.push(a.product);
+  }
+  if (VISUAL_VERB.test(text) && !found.length) {
+    found.push("radar", "satellite", "map");
+  }
+  if (/\b(weather|temp|forecast|conditions|humidity|wind|brief|hose|grill)\b/i.test(text) && !found.length) {
+    found.push("forecast_chart");
+  }
+  return found;
+}
+function nearestRadar(lat, lon) {
+  const sites = [
+    ["KBUF", 42.9489, -78.7369],
+    ["KTYX", 43.7558, -75.68],
+    ["KBGM", 42.1997, -75.9847],
+    ["KENX", 42.5864, -74.0644],
+    ["KCLE", 41.4131, -81.8597]
+  ];
+  let best = "KBUF";
+  let bestD = Infinity;
+  for (const [id, slat, slon] of sites) {
+    const d = (lat - slat) ** 2 + (lon - slon) ** 2;
+    if (d < bestD) {
+      bestD = d;
+      best = id;
+    }
+  }
+  return best;
+}
+function buildVisuals(opts) {
+  const products = detectProducts(opts.message);
+  const { lat, lon, locationName, toolData } = opts;
+  const site = nearestRadar(lat, lon);
+  const visuals = [];
+  const reading = toolData?.reading || toolData?.current?.reading;
+  const decision = toolData?.decision;
+  const forecastRows = toolData?.forecast || toolData?.forecast?.forecast;
+  if (reading || decision) {
+    const metrics = [];
+    if (reading?.tempF != null) metrics.push({ label: "Temp", value: `${reading.tempF}\xB0F` });
+    if (reading?.humidityPct != null) metrics.push({ label: "RH", value: `${reading.humidityPct}%` });
+    if (reading?.windMph != null) metrics.push({ label: "Wind", value: `${reading.windMph} mph` });
+    if (reading?.text) metrics.push({ label: "Sky", value: String(reading.text) });
+    if (decision) metrics.push({ label: "Call", value: String(decision) });
+    if (metrics.length) {
+      visuals.push(
+        item({
+          id: "metrics-now",
+          type: "metrics",
+          title: `Now \u2014 ${locationName}`,
+          product: "metrics",
+          source: "Open-Meteo + Doc AI",
+          metrics
+        })
+      );
+    }
+  }
+  const wantForecast = products.includes("forecast_chart") || opts.toolName === "get_forecast" || opts.toolName === "chat_summary" || opts.toolName === "should_i" || opts.toolName === "get_current_weather";
+  if (Array.isArray(forecastRows) && forecastRows.length && (wantForecast || products.length > 0)) {
+    visuals.push(
+      item({
+        id: "chart-forecast",
+        type: "chart",
+        title: `Forecast chart \u2014 ${locationName}`,
+        product: "forecast_chart",
+        source: "Open-Meteo",
+        chart_kind: "series",
+        chart_data: {
+          periods: forecastRows.slice(0, 8).map((r) => ({
+            name: String(r.observedAt || "").slice(0, 10),
+            temperature: r.tempF,
+            shortForecast: r.text
+          }))
+        }
+      })
+    );
+  } else if (wantForecast && !forecastRows?.length) {
+    products.push("forecast_chart");
+  }
+  const wantRadar = products.includes("radar") || products.includes("radar_velocity") || products.includes("alerts_map");
+  if (wantRadar) {
+    const frames = [0, 1, 2, 3, 4].map(
+      (i) => `https://mesonet.agron.iastate.edu/data/gis/images/4326/USCOMP/n0q_${i}.png`
+    );
+    visuals.push(
+      item({
+        id: "radar-us",
+        type: "image",
+        title: "US composite reflectivity",
+        product: "radar",
+        source: "IEM USCOMP",
+        caption: "Live CONUS base reflectivity",
+        url: "https://mesonet.agron.iastate.edu/data/gis/images/4326/USCOMP/n0q_0.png",
+        href: `https://radar.weather.gov/?center=${lat},${lon}&zoom=7`
+      }),
+      item({
+        id: "radar-site",
+        type: "image",
+        title: `${site} base reflectivity`,
+        product: "radar",
+        source: "IEM ridge",
+        url: `https://mesonet.agron.iastate.edu/data/gis/images/4326/ridge/${site}/N0Q_0.png`
+      }),
+      item({
+        id: "radar-loop",
+        type: "image_loop",
+        title: "Radar loop (US composite)",
+        product: "radar",
+        source: "IEM USCOMP",
+        urls: frames
+      })
+    );
+  }
+  if (products.includes("radar_velocity")) {
+    visuals.push(
+      item({
+        id: "radar-n0u",
+        type: "image",
+        title: `${site} base velocity`,
+        product: "radar_velocity",
+        source: "IEM ridge",
+        url: `https://mesonet.agron.iastate.edu/data/gis/images/4326/ridge/${site}/N0U_0.png`
+      })
+    );
+  }
+  if (products.includes("satellite")) {
+    visuals.push(
+      item({
+        id: "sat-ne",
+        type: "image",
+        title: "GOES-19 Northeast GeoColor",
+        product: "satellite",
+        source: "NOAA NESDIS",
+        url: "https://cdn.star.nesdis.noaa.gov/GOES19/ABI/SECTOR/ne/GEOCOLOR/latest.jpg"
+      }),
+      item({
+        id: "sat-conus",
+        type: "image",
+        title: "GOES-19 CONUS GeoColor",
+        product: "satellite",
+        source: "NOAA NESDIS",
+        url: "https://cdn.star.nesdis.noaa.gov/GOES19/ABI/CONUS/GEOCOLOR/latest.jpg"
+      })
+    );
+  }
+  if (products.includes("upper_air") || products.includes("surface_map")) {
+    visuals.push(
+      item({
+        id: "ua-sfc",
+        type: "image",
+        title: "WPC Surface Analysis",
+        product: "upper_air",
+        source: "NOAA/NWS WPC",
+        caption: "Live surface analysis",
+        url: "https://www.wpc.ncep.noaa.gov/sfc/namussfcwbg.gif",
+        href: "https://www.wpc.ncep.noaa.gov/sfc/sfc_conus.php"
+      }),
+      item({
+        id: "ua-basic",
+        type: "image",
+        title: "WPC Basic Weather",
+        product: "upper_air",
+        source: "NOAA/NWS WPC",
+        url: "https://www.wpc.ncep.noaa.gov/basicwx/92fwbg.gif",
+        href: "https://www.wpc.ncep.noaa.gov/basicwx/basicwx_ndfd.php"
+      }),
+      item({
+        id: "ua-rap-500",
+        type: "link_card",
+        title: "RAP 500 mb height/vorticity (MAG)",
+        product: "upper_air",
+        source: "NCEP MAG",
+        caption: "Model guidance for 500 mb",
+        href: "https://mag.ncep.noaa.gov/model-guidance-model-parameter.php?group=Model%20Guidance&model=RAP&area=Namer&param=500_ht_abs_vort"
+      })
+    );
+  }
+  if (products.includes("skew_t") || products.includes("hodograph") || products.includes("composite")) {
+    visuals.push(
+      item({
+        id: "skew-spc",
+        type: "link_card",
+        title: "SPC observed soundings",
+        product: "skew_t",
+        source: "SPC",
+        caption: "Interactive radiosonde explorer",
+        href: "https://www.spc.noaa.gov/exper/soundings/"
+      }),
+      item({
+        id: "skew-doc",
+        type: "link_card",
+        title: "DOC Skew-T / tools",
+        product: "skew_t",
+        source: "whatsupdoc.fyi",
+        href: `https://whatsupdoc.fyi/tools`
+      })
+    );
+  }
+  if (products.includes("spc_outlook")) {
+    visuals.push(
+      item({
+        id: "spc-d1",
+        type: "image",
+        title: "SPC Day 1 convective outlook",
+        product: "spc_outlook",
+        source: "NWS SPC",
+        url: "https://www.spc.noaa.gov/products/outlook/day1otlk_sm.png",
+        href: "https://www.spc.noaa.gov/products/outlook/"
+      })
+    );
+  }
+  if (products.includes("qpf")) {
+    visuals.push(
+      item({
+        id: "qpf-wpc",
+        type: "image",
+        title: "WPC QPF",
+        product: "qpf",
+        source: "NOAA/NWS WPC",
+        url: "https://www.wpc.ncep.noaa.gov/qpf/fill_94qwbg.gif",
+        href: "https://www.wpc.ncep.noaa.gov/qpf/qpf2.shtml"
+      })
+    );
+  }
+  if (products.includes("hurricane")) {
+    visuals.push(
+      item({
+        id: "nhc-cone",
+        type: "image",
+        title: "NHC Atlantic cone",
+        product: "hurricane",
+        source: "NHC",
+        url: "https://www.nhc.noaa.gov/xgtwo/two_atl_5d0.png",
+        href: "https://www.nhc.noaa.gov/"
+      })
+    );
+  }
+  if (products.includes("map") || products.includes("alerts_map")) {
+    visuals.push(
+      item({
+        id: "map-point",
+        type: "map",
+        title: `Map \u2014 ${locationName}`,
+        product: "map",
+        source: "OpenStreetMap",
+        lat,
+        lon,
+        zoom: 7,
+        href: `https://www.openstreetmap.org/#map=7/${lat.toFixed(4)}/${lon.toFixed(4)}`
+      }),
+      item({
+        id: "map-rainviewer",
+        type: "link_card",
+        title: "RainViewer animated radar",
+        product: "map",
+        source: "RainViewer",
+        href: `https://www.rainviewer.com/map.html?loc=${lat},${lon},7`
+      })
+    );
+  }
+  if (products.includes("threat_shield") || products.includes("scri")) {
+    visuals.push(
+      item({
+        id: "doc-threat",
+        type: "link_card",
+        title: "DOC Threat Shield",
+        product: "threat_shield",
+        source: "whatsupdoc.fyi",
+        href: "https://whatsupdoc.fyi/threat-shield"
+      }),
+      item({
+        id: "doc-globe",
+        type: "link_card",
+        title: "DOC Globe",
+        product: "map",
+        source: "whatsupdoc.fyi",
+        href: "https://whatsupdoc.fyi/doc"
+      })
+    );
+  }
+  const delivered = [...new Set(visuals.map((v) => v.product))];
+  return { visuals, products: delivered.length ? delivered : products };
+}
+var ALIASES, VISUAL_VERB;
+var init_visuals = __esm({
+  "agent/visuals.ts"() {
+    "use strict";
+    ALIASES = [
+      { product: "radar", re: /\bradar\b|\bnexrad\b|\breflectivity\b/i },
+      { product: "radar_velocity", re: /\bvelocity\b|\bcouplet|\bsrv\b/i },
+      { product: "satellite", re: /\bsatellite\b|\bgoes\b|\bgeocolor\b|\binfrared\b|\bwater\s+vapor\b/i },
+      { product: "skew_t", re: /\bskew[-\s]?t\b|\bsounding\b|\batmospheric\s+profile\b/i },
+      { product: "hodograph", re: /\bhodograph\b|\bwind\s+profile\b/i },
+      { product: "spc_outlook", re: /\bspc\b|\boutlook\b|\bday\s*[123]\s+risk\b|\bconvective\s+outlook\b/i },
+      { product: "surface_map", re: /\bsurface\s+(?:map|analysis|chart)\b|\bwpc\b|\bfronts?\b/i },
+      { product: "upper_air", re: /\bupper[-\s]?air\b|\b500\s*mb\b|\b850\s*mb\b|\b300\s*mb\b/i },
+      { product: "forecast_chart", re: /\bforecast\s+chart\b|\btemp(?:erature)?\s+chart\b|\b7[-\s]?day\b|\bhourly\s+chart\b|\bmeteogram\b|\bgraph\b/i },
+      { product: "map", re: /\bmap\b|\bglobe\b|\bopenstreetmap\b/i },
+      { product: "alerts_map", re: /\balert(?:s)?\s+map\b|\bhazards?\s+map\b/i },
+      { product: "qpf", re: /\bqpf\b|\bprecip(?:itation)?\s+(?:map|forecast|chart)\b/i },
+      { product: "hurricane", re: /\bhurricane\b|\btropical\b|\bnhc\b|\bcone\b/i },
+      { product: "threat_shield", re: /\bthreat\s+shield\b|\bdti\b/i },
+      { product: "scri", re: /\bscri\b|\bsupercell\s+composite\b/i },
+      { product: "composite", re: /\bcape\b|\bstp\b|\bscp\b|\bparameters?\b/i },
+      { product: "fire", re: /\bwildfire\b|\bfirms\b|\bhotspot/i }
+    ];
+    VISUAL_VERB = /\b(show|display|plot|draw|generate|render|pull|fetch|get|open|load|see|view|give\s+me|send\s+me|bring\s+up|chart|map|loop|graphic|visual|image|picture|diagram)\b/i;
+  }
+});
+
+// agent/routeChat.ts
+var routeChat_exports = {};
+__export(routeChat_exports, {
+  pickTool: () => pickTool,
+  talkToDocMcp: () => talkToDocMcp
+});
+function pickTool(message) {
+  const s = message.toLowerCase();
+  if (/\biot\b|sensor|probe|mesh/.test(s)) return { name: "list_iot_sources", args: {} };
+  if (/should i|can i|safe to|leave the hose|cover the grill|walk the dog|cover the boat/.test(s)) {
+    return { name: "should_i", args: { activity: message } };
+  }
+  if (/\bradar\b|\bsatellite\b|\bgoes\b|\bskew|\bsounding\b|\bupper[-\s]?air\b|\b500\s*mb\b|\bhodograph\b|\boutlook\b|\bmeteogram\b/.test(s)) {
+    return { name: "chat_summary", args: {} };
+  }
+  if (/\b(confirm|confirmed|go ahead)\b/.test(s) && !/warning|yesterday/.test(s)) {
+    return { name: "watch_conditions", args: { confirm: true, hazard: message } };
+  }
+  if (/\bwatch for\b|\bfreeze watch\b|keep (an |a )?eye|set a watch|^watch /.test(s)) {
+    return { name: "watch_conditions", args: { confirm: false, hazard: message } };
+  }
+  if (/\bbrief|summary|everything|situation|what's happening|whats happening/.test(s)) {
+    return { name: "chat_summary", args: {} };
+  }
+  if (/\bhistor|last week|yesterday|2026-09|archive/.test(s)) {
+    return { name: "get_historical", args: { date_range: "2026-09-15 to 2026-09-18" } };
+  }
+  if (/\balert|warning|advisory/.test(s)) return { name: "get_alerts", args: {} };
+  if (/\bforecast|tomorrow|tonight|weekend|days?\b/.test(s)) {
+    return { name: "get_forecast", args: { days: 3 } };
+  }
+  return { name: "get_current_weather", args: {} };
+}
+async function talkToDocMcp(input) {
+  const loc = resolveLocation({
+    location: input.location_name || "rochester"
+  });
+  const picked = pickTool(input.message || "");
+  const args = { ...picked.args, location: loc.key };
+  const out = await runTool(picked.name, args);
+  const spoken2 = out.spoken;
+  const products = detectProducts(input.message || "");
+  const nested = out.data;
+  let forecast = Array.isArray(nested.forecast) ? nested.forecast : Array.isArray(nested.forecast?.forecast) ? nested.forecast.forecast : [];
+  const needsChart = products.includes("forecast_chart") || picked.name === "chat_summary" || picked.name === "should_i" || picked.name === "get_forecast" || picked.name === "get_current_weather";
+  if (needsChart && !forecast.length) {
+    const fc = await getForecast({ location: loc.key, days: 3 });
+    forecast = fc.data.forecast || [];
+  }
+  const pack2 = buildVisuals({
+    message: input.message || "",
+    lat: loc.lat,
+    lon: loc.lon,
+    locationName: loc.label,
+    toolName: picked.name,
+    toolData: { ...out.data, forecast, reading: nested.reading }
+  });
+  return {
+    agent: "doc",
+    intent: picked.name,
+    tool: picked.name,
+    location: input.location || [loc.lat, loc.lon],
+    location_name: loc.label,
+    response_text: spoken2,
+    doc_response: { activated: true, response: spoken2 },
+    modules_invoked: ["alexa_mcp", picked.name, "doc_visuals"],
+    source: "doc-ai-alexa-mcp",
+    llm: "alexa-plus",
+    note: "MCP tool facts for Alexa+. Visuals are live NOAA/IEM/WPC/SPC products.",
+    spoken: spoken2,
+    data: out.data,
+    card: out.card,
+    visuals: pack2.visuals,
+    products_requested: products,
+    products_delivered: pack2.products
+  };
+}
+var init_routeChat = __esm({
+  "agent/routeChat.ts"() {
+    "use strict";
+    init_locations();
+    init_orchestrator();
+    init_tools();
+    init_visuals();
+  }
+});
+
+// server/lambda.ts
+var lambda_exports = {};
+__export(lambda_exports, {
+  handler: () => handler
+});
+module.exports = __toCommonJS(lambda_exports);
+var import_serverless_http = __toESM(require_serverless_http(), 1);
+
+// server/lambdaApp.ts
+var import_node_fs3 = require("node:fs");
+var import_node_path3 = require("node:path");
+var import_cors = __toESM(require_lib(), 1);
+var import_express = __toESM(require_express2(), 1);
+init_ingest();
+init_tools();
 
 // server/lambdaMcp.ts
 var import_node_crypto = require("node:crypto");
+init_tools();
 function ok(res, id, result, sessionId) {
   if (sessionId) res.setHeader("mcp-session-id", sessionId);
   res.setHeader("Content-Type", "application/json");
@@ -25893,10 +26928,10 @@ async function handleLambdaMcpPost(req, res) {
       res,
       id,
       {
-        tools: TOOL_NAMES.map((name) => ({
-          name,
-          description: `Doc AI tool ${name}`,
-          inputSchema: { type: "object", properties: { location: { type: "string" } } }
+        tools: TOOL_CATALOG.map((t) => ({
+          name: t.name,
+          description: t.description,
+          inputSchema: t.inputSchema
         }))
       },
       sessionId || void 0
@@ -25917,7 +26952,7 @@ async function handleLambdaMcpPost(req, res) {
         id,
         {
           content: [{ type: "text", text: out.spoken }],
-          structuredContent: out
+          structuredContent: { spoken: out.spoken, card: out.card, ...out.data }
         },
         sessionId || void 0
       );
@@ -25937,7 +26972,13 @@ async function handleLambdaMcpPost(req, res) {
 process.env.DOC_AI_DB = process.env.DOC_AI_DB || "/tmp/doc-ai.sqlite";
 ensureSeeded();
 var app = (0, import_express.default)();
-app.use((0, import_cors.default)({ origin: true }));
+app.use(
+  (0, import_cors.default)({
+    origin: true,
+    exposedHeaders: ["mcp-session-id", "Mcp-Session-Id"],
+    allowedHeaders: ["Content-Type", "Accept", "mcp-session-id", "MCP-Protocol-Version"]
+  })
+);
 app.use(import_express.default.json({ limit: "1mb" }));
 var webRoot = [(0, import_node_path3.join)(process.cwd(), "web"), (0, import_node_path3.join)("/var/task", "web")].find((p) => (0, import_node_fs3.existsSync)(p));
 if (webRoot) app.use(import_express.default.static(webRoot));
@@ -25953,7 +26994,8 @@ app.get("/health", (_req, res) => {
       methods: ["POST", "GET"]
     },
     tools: TOOL_NAMES,
-    model: process.env.GROK_MODEL || "grok-4-fast-non-reasoning"
+    llm: "alexa-plus",
+    note: "No Grok/xAI in this service. Alexa+ is the LLM; Doc AI is MCP tools only."
   });
 });
 app.get("/api/tools", (_req, res) => res.json({ tools: TOOL_NAMES }));
@@ -25964,6 +27006,26 @@ app.post("/api/tools/:name", async (req, res) => {
   } catch (err2) {
     const message = err2 instanceof Error ? err2.message : String(err2);
     res.status(404).json({ error: message, spoken: `I could not run that tool. ${message}.` });
+  }
+});
+app.post("/api/public/chat", async (req, res) => {
+  try {
+    const { talkToDocMcp: talkToDocMcp2 } = await Promise.resolve().then(() => (init_routeChat(), routeChat_exports));
+    const body = req.body || {};
+    const message = String(body.message || body.q || "").trim();
+    if (!message) {
+      res.status(400).json({ error: "message is required" });
+      return;
+    }
+    const result = await talkToDocMcp2({
+      message,
+      location_name: body.location_name,
+      location: body.location
+    });
+    res.json(result);
+  } catch (err2) {
+    const message = err2 instanceof Error ? err2.message : String(err2);
+    res.status(500).json({ error: message, response_text: `DOC MCP failed. ${message}.` });
   }
 });
 app.post("/mcp", async (req, res) => {

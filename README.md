@@ -19,7 +19,7 @@ npm run dev
 Then:
 
 - Health: http://127.0.0.1:8790/health
-- Alexa+ sim: http://127.0.0.1:8790/
+- Alexa+ Echo Show sim: http://127.0.0.1:8790/  (real MCP client: initialize, tools/list, tools/call)
 - MCP: `POST` and `GET` http://127.0.0.1:8790/mcp
 
 Tests: `npm test`
@@ -29,11 +29,13 @@ Tests: `npm test`
 | Tool | What it does |
 |------|----------------|
 | `get_current_weather` | Live Open-Meteo (seed fallback) |
-| `get_forecast` | Daily forecast, `days` default 7 |
+| `get_forecast` | Daily forecast, `days` default 3 |
 | `get_alerts` | NWS `api.weather.gov` alerts (seed fallback) |
 | `get_historical` | Date-range query against stored readings |
 | `list_iot_sources` | Simulated IoT nodes |
-| `chat_summary` | Fact briefing string for Alexa+ to voice (no third-party LLM) |
+| `chat_summary` | Fact briefing string for Alexa+ to voice, including confirmed watches |
+| `should_i` | Household decision: hose, grill, dog, drive, boat — yes / caution / no |
+| `watch_conditions` | Propose a freeze watch, confirm it into SQLite, then include it in briefings |
 
 ## Data layer
 
@@ -50,7 +52,7 @@ data/       ingest, normalize, SQLite, seed, IoT sim
 agent/      voice formatter + tool orchestrator
 deploy/     Dockerfile companion, App Runner script
 docs/       product-feedback, friction log, Devpost paste, demo script
-web/        simulated Alexa+ chat
+web/        Echo Show sim (real MCP client + TTS)
 ```
 
 ## Deploy (AWS App Runner)

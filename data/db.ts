@@ -59,8 +59,93 @@ export function getDb(): DatabaseSync {
       lon REAL,
       unit TEXT
     );
+    CREATE TABLE IF NOT EXISTS watches (
+      location_key TEXT NOT NULL,
+      hazard TEXT NOT NULL,
+      status TEXT NOT NULL,
+      created_at TEXT NOT NULL,
+      confirmed_at TEXT,
+      PRIMARY KEY (location_key, hazard)
+    );
   `);
   return db;
+}
+
+export type WatchRow = {
+  locationKey: string;
+  hazard: string;
+  status: "pending" | "active";
+  createdAt: string;
+  confirmedAt: string | null;
+};
+
+function watchFromRow(row: any): WatchRow {
+  return {
+    locationKey: row.location_key,
+    hazard: row.hazard,
+    status: row.status,
+    createdAt: row.created_at,
+    confirmedAt: row.confirmed_at ?? null,
+  };
+}
+
+export function proposeWatch(locationKey: string, hazard: string): WatchRow {
+  const now = new Date().toISOString();
+  getDb()
+    .prepare(
+      `INSERT INTO watches (location_key, hazard, status, created_at, confirmed_at)
+       VALUES (?, ?, 'pending', ?, NULL)
+       ON CONFLICT(location_key, hazard) DO UPDATE SET
+         status = CASE WHEN watches.status = 'active' THEN 'active' ELSE 'pending' END,
+         created_at = excluded.created_at`
+    )
+    .run(locationKey, hazard, now);
+  return getWatch(locationKey, hazard)!;
+}
+
+export function confirmWatch(locationKey: string, hazard: string): WatchRow {
+  const now = new Date().toISOString();
+  const existing = getWatch(locationKey, hazard);
+  if (!existing) {
+    getDb()
+      .prepare(
+        `INSERT INTO watches (location_key, hazard, status, created_at, confirmed_at)
+         VALUES (?, ?, 'active', ?, ?)`
+      )
+      .run(locationKey, hazard, now, now);
+  } else {
+    getDb()
+      .prepare(
+        `UPDATE watches SET status = 'active', confirmed_at = ? WHERE location_key = ? AND hazard = ?`
+      )
+      .run(now, locationKey, hazard);
+  }
+  return getWatch(locationKey, hazard)!;
+}
+
+export function getWatch(locationKey: string, hazard: string): WatchRow | null {
+  const row = getDb()
+    .prepare(`SELECT * FROM watches WHERE location_key = ? AND hazard = ?`)
+    .get(locationKey, hazard) as any;
+  return row ? watchFromRow(row) : null;
+}
+
+export function deleteWatch(locationKey: string, hazard: string): void {
+  getDb().prepare(`DELETE FROM watches WHERE location_key = ? AND hazard = ?`).run(locationKey, hazard);
+}
+
+export function listWatches(locationKey?: string, status?: "pending" | "active"): WatchRow[] {
+  const d = getDb();
+  if (locationKey && status) {
+    return (d.prepare(`SELECT * FROM watches WHERE location_key = ? AND status = ?`).all(locationKey, status) as any[]).map(watchFromRow);
+  }
+  if (locationKey) {
+    return (d.prepare(`SELECT * FROM watches WHERE location_key = ?`).all(locationKey) as any[]).map(watchFromRow);
+  }
+  if (status) {
+    return (d.prepare(`SELECT * FROM watches WHERE status = ?`).all(status) as any[]).map(watchFromRow);
+  }
+  return (d.prepare(`SELECT * FROM watches`).all() as any[]).map(watchFromRow);
 }
 
 export function resetDbConnection(): void {

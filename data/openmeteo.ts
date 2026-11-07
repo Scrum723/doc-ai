@@ -20,7 +20,7 @@ export async function fetchOpenMeteoCurrentAndForecast(
   const url =
     `${FORECAST_HOST}/v1/forecast?latitude=${lat}&longitude=${lon}` +
     `&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation,weather_code` +
-    `&daily=temperature_2m_max,precipitation_sum,wind_speed_10m_max,weather_code` +
+    `&daily=temperature_2m_max,temperature_2m_min,precipitation_sum,wind_speed_10m_max,weather_code` +
     `&forecast_days=${Math.min(16, Math.max(1, days))}` +
     `&temperature_unit=fahrenheit&wind_speed_unit=mph&precipitation_unit=inch`;
   console.log(`[Open-Meteo] GET ${url}`);
@@ -40,7 +40,8 @@ export async function fetchOpenMeteoCurrentAndForecast(
           daily.temperature_2m_max?.[i] ?? null,
           daily.precipitation_sum?.[i] ?? null,
           daily.wind_speed_10m_max?.[i] ?? null,
-          daily.weather_code?.[i]
+          daily.weather_code?.[i],
+          daily.temperature_2m_min?.[i] ?? null
         )
       );
     }

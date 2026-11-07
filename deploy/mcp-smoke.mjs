@@ -34,6 +34,8 @@ const required = [
   "get_historical",
   "list_iot_sources",
   "chat_summary",
+  "should_i",
+  "watch_conditions",
 ];
 const missing = required.filter((n) => !names.includes(n));
 if (missing.length || !protocol || protocol < "2025-11-25") {

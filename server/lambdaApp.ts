@@ -15,7 +15,13 @@ process.env.DOC_AI_DB = process.env.DOC_AI_DB || "/tmp/doc-ai.sqlite";
 ensureSeeded();
 
 export const app = express();
-app.use(cors({ origin: true }));
+app.use(
+  cors({
+    origin: true,
+    exposedHeaders: ["mcp-session-id", "Mcp-Session-Id"],
+    allowedHeaders: ["Content-Type", "Accept", "mcp-session-id", "MCP-Protocol-Version"],
+  })
+);
 app.use(express.json({ limit: "1mb" }));
 
 const webRoot = [join(process.cwd(), "web"), join("/var/task", "web")].find((p) => existsSync(p));

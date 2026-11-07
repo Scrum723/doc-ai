@@ -135,9 +135,9 @@
   },
   "seedForecast": {
     "rochester": [
-      { "dayOffset": 0, "tempF": 58, "text": "Sunny", "windMph": 7, "precipIn": 0 },
-      { "dayOffset": 1, "tempF": 62, "text": "Partly cloudy", "windMph": 9, "precipIn": 0.05 },
-      { "dayOffset": 2, "tempF": 49, "text": "Cooler with showers", "windMph": 14, "precipIn": 0.3 }
+      { "dayOffset": 0, "tempF": 58, "minTempF": 42, "text": "Sunny", "windMph": 7, "precipIn": 0 },
+      { "dayOffset": 1, "tempF": 62, "minTempF": 46, "text": "Partly cloudy", "windMph": 9, "precipIn": 0.05 },
+      { "dayOffset": 2, "tempF": 49, "minTempF": 38, "text": "Cooler with showers", "windMph": 14, "precipIn": 0.3 }
     ]
   },
   "seedAlerts": [

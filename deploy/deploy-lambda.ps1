@@ -38,7 +38,17 @@ if ($LASTEXITCODE -ne 0) {
 }
 
 $zip = Join-Path $Root "dist-lambda.zip"
-$envJson = '[{"name":"HOST","value":"0.0.0.0"},{"name":"PORT","value":"8790"},{"name":"DOC_AI_DB","value":"/tmp/doc-ai.sqlite"},{"name":"GROK_MODEL","value":"grok-4-fast-non-reasoning"},{"name":"XAI_MODEL","value":"grok-4-fast-non-reasoning"},{"name":"ALLOWED_ORIGINS","value":"https://whatsupdoc.fyi,https://www.whatsupdoc.fyi,https://api.whatsupdoc.fyi"}]'
+$envFile = Join-Path $env:TEMP "doc-ai-lambda-env.json"
+@'
+{
+  "Variables": {
+    "HOST": "0.0.0.0",
+    "PORT": "8790",
+    "DOC_AI_DB": "/tmp/doc-ai.sqlite",
+    "ALLOWED_ORIGINS": "https://whatsupdoc.fyi,https://www.whatsupdoc.fyi,https://api.whatsupdoc.fyi,https://doc-platform-web-production.up.railway.app"
+  }
+}
+'@ | Set-Content -Path $envFile -Encoding ascii
 
 aws lambda get-function --function-name $Fn --region $Region 2>$null | Out-Null
 if ($LASTEXITCODE -ne 0) {
@@ -52,7 +62,7 @@ if ($LASTEXITCODE -ne 0) {
     --timeout 30 `
     --memory-size 512 `
     --architectures arm64 `
-    --environment "Variables={HOST=0.0.0.0,PORT=8790,DOC_AI_DB=/tmp/doc-ai.sqlite,GROK_MODEL=grok-4-fast-non-reasoning,XAI_MODEL=grok-4-fast-non-reasoning,ALLOWED_ORIGINS=https://whatsupdoc.fyi,https://www.whatsupdoc.fyi,https://api.whatsupdoc.fyi}" `
+    --environment "file://$envFile" `
     --region $Region | Out-Null
 } else {
   Write-Host "Updating function code $Fn"
@@ -62,7 +72,7 @@ if ($LASTEXITCODE -ne 0) {
     --function-name $Fn `
     --timeout 30 `
     --memory-size 512 `
-    --environment "Variables={HOST=0.0.0.0,PORT=8790,DOC_AI_DB=/tmp/doc-ai.sqlite,GROK_MODEL=grok-4-fast-non-reasoning,XAI_MODEL=grok-4-fast-non-reasoning,ALLOWED_ORIGINS=https://whatsupdoc.fyi,https://www.whatsupdoc.fyi,https://api.whatsupdoc.fyi}" `
+    --environment "file://$envFile" `
     --region $Region | Out-Null
 }
 

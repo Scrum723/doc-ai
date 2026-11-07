@@ -4,7 +4,7 @@
  */
 import { randomUUID } from "node:crypto";
 import type { Request, Response } from "express";
-import { TOOL_NAMES, runTool } from "../agent/tools.js";
+import { TOOL_CATALOG, TOOL_NAMES, runTool } from "../agent/tools.js";
 
 type JsonRpc = {
   jsonrpc?: string;
@@ -56,10 +56,10 @@ export async function handleLambdaMcpPost(req: Request, res: Response): Promise<
       res,
       id,
       {
-        tools: TOOL_NAMES.map((name) => ({
-          name,
-          description: `Doc AI tool ${name}`,
-          inputSchema: { type: "object", properties: { location: { type: "string" } } },
+        tools: TOOL_CATALOG.map((t) => ({
+          name: t.name,
+          description: t.description,
+          inputSchema: t.inputSchema,
         })),
       },
       sessionId || undefined
@@ -70,7 +70,7 @@ export async function handleLambdaMcpPost(req: Request, res: Response): Promise<
   if (method === "tools/call") {
     const name = body.params?.name as string;
     const args = (body.params?.arguments || {}) as Record<string, unknown>;
-    if (!name || !(TOOL_NAMES as readonly string[]).includes(name)) {
+    if (!name || !TOOL_NAMES.includes(name)) {
       err(res, id, -32601, `Unknown tool: ${name}`);
       return;
     }
@@ -81,7 +81,7 @@ export async function handleLambdaMcpPost(req: Request, res: Response): Promise<
         id,
         {
           content: [{ type: "text", text: out.spoken }],
-          structuredContent: out,
+          structuredContent: { spoken: out.spoken, card: out.card, ...out.data },
         },
         sessionId || undefined
       );

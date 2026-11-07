@@ -11,4 +11,15 @@ describe("pickTool (Alexa+ MCP routing)", () => {
   it("defaults to current weather", () => {
     expect(pickTool("what's the weather in Rochester?").name).toBe("get_current_weather");
   });
+  it("routes household jobs to should_i", () => {
+    expect(pickTool("Should I leave the hose out?").name).toBe("should_i");
+  });
+  it("routes freeze watch before alerts", () => {
+    expect(pickTool("Watch Rochester for freeze").name).toBe("watch_conditions");
+    expect(pickTool("Confirm freeze watch").name).toBe("watch_conditions");
+    expect(pickTool("Confirm freeze watch").args.confirm).toBe(true);
+  });
+  it("keeps freeze warnings on alerts", () => {
+    expect(pickTool("any freeze warnings?").name).toBe("get_alerts");
+  });
 });

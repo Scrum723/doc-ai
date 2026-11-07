@@ -53,7 +53,7 @@ export function seedDatabase(): void {
           windMph: d.windMph,
           precipIn: d.precipIn,
           text: d.text,
-          extra: { seeded: true, host: "api.open-meteo.com" },
+          extra: { seeded: true, host: "api.open-meteo.com", minTempF: d.minTempF ?? null },
         };
       })
     );

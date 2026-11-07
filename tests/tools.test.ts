@@ -7,7 +7,7 @@ import { fileURLToPath } from "node:url";
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 describe("Doc AI surface", () => {
-  it("exposes the six exact tool names", () => {
+  it("exposes the eight tool names", () => {
     expect([...TOOL_NAMES].sort()).toEqual(
       [
         "chat_summary",
@@ -16,6 +16,8 @@ describe("Doc AI surface", () => {
         "get_forecast",
         "get_historical",
         "list_iot_sources",
+        "should_i",
+        "watch_conditions",
       ].sort()
     );
   });

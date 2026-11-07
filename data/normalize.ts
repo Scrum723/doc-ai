@@ -53,7 +53,8 @@ export function normalizeOpenMeteoForecastDay(
   tempF: number | null,
   precipIn: number | null,
   windMph: number | null,
-  weatherCode?: number
+  weatherCode?: number,
+  minTempF?: number | null
 ): NormalizedReading {
   return {
     locationKey,
@@ -65,7 +66,10 @@ export function normalizeOpenMeteoForecastDay(
     windMph,
     precipIn,
     text: weatherCodeText(weatherCode),
-    extra: { host: "api.open-meteo.com" },
+    extra: {
+      host: "api.open-meteo.com",
+      minTempF: minTempF != null ? Math.round(Number(minTempF)) : null,
+    },
   };
 }
 

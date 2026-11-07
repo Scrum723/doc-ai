@@ -3,75 +3,421 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Doc AI — Alexa+ simulation</title>
+  <title>Doc AI — Alexa+ Echo Show sim</title>
   <style>
-    :root { --bg:#0d1117; --card:#161b22; --a:#58a6ff; --t:#e6edf3; --m:#8b949e; }
+    :root {
+      --bg: #0b0d12;
+      --bezel: #141820;
+      --panel: #1b2130;
+      --ink: #f4f6fb;
+      --mute: #9aa3b5;
+      --alexa: #5eb1ff;
+      --go: #3dd68c;
+      --caution: #f5c14a;
+      --stop: #ff7a7a;
+      --line: #2a3142;
+    }
     * { box-sizing: border-box; }
-    body { margin:0; min-height:100vh; font-family:"Segoe UI",system-ui,sans-serif; background:var(--bg); color:var(--t); display:grid; place-items:center; padding:1rem; }
-    .phone { width:min(420px,100%); background:#11161d; border:1px solid #30363d; border-radius:28px; padding:1.2rem; }
-    .orb { width:64px; height:64px; border-radius:50%; margin:0.4rem auto 0.8rem; background:radial-gradient(circle at 30% 30%, #9cf, var(--a), #123); }
-    h1 { text-align:center; font-size:1.1rem; margin:0; }
-    .sub { text-align:center; color:var(--m); font-size:0.85rem; margin:0.3rem 0 0.8rem; }
-    .chat { background:var(--card); border-radius:16px; height:360px; overflow:auto; padding:0.75rem; display:flex; flex-direction:column; gap:0.55rem; }
-    .msg { max-width:92%; padding:0.65rem 0.8rem; border-radius:14px; font-size:0.92rem; line-height:1.4; white-space:pre-wrap; }
-    .user { align-self:flex-end; background:#21262d; }
-    .agent { align-self:flex-start; background:#0d2137; border:1px solid #1f4b73; }
-    form { display:flex; gap:0.5rem; margin-top:0.8rem; }
-    input { flex:1; border-radius:999px; border:1px solid #30363d; background:#0d1117; color:var(--t); padding:0.7rem 1rem; font:inherit; }
-    button { border:none; border-radius:999px; background:var(--a); color:#041018; font-weight:700; padding:0 1rem; cursor:pointer; }
-    .chips { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.7rem; }
-    .chips button { background:#21262d; color:var(--t); font-size:0.75rem; padding:0.4rem 0.65rem; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Amazon Ember", "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(1200px 600px at 50% -10%, #1a2740 0%, transparent 55%),
+        var(--bg);
+      color: var(--ink);
+      padding: 1.25rem;
+    }
+    .stage {
+      max-width: 1180px;
+      margin: 0 auto;
+      display: grid;
+      gap: 0.85rem;
+    }
+    .meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      color: var(--mute);
+      font-size: 0.85rem;
+    }
+    .show {
+      background: var(--bezel);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      padding: 1rem 1rem 1.1rem;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.45);
+    }
+    .screen {
+      display: grid;
+      grid-template-columns: 1.35fr 0.85fr;
+      gap: 0.9rem;
+      min-height: 420px;
+    }
+    @media (max-width: 860px) {
+      .screen { grid-template-columns: 1fr; }
+      .wire { max-height: 220px; }
+    }
+    .card {
+      background: linear-gradient(180deg, #222a3c 0%, #171c28 100%);
+      border-radius: 20px;
+      padding: 1.4rem 1.5rem 1.2rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 380px;
+    }
+    .top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--mute);
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .orb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--alexa) 45%, #123);
+      box-shadow: 0 0 16px rgba(94,177,255,0.7);
+    }
+    .headline {
+      font-size: clamp(3.2rem, 8vw, 6.2rem);
+      line-height: 0.95;
+      font-weight: 650;
+      margin: 1.2rem 0 0.35rem;
+      letter-spacing: -0.04em;
+    }
+    .headline.yes { color: var(--go); }
+    .headline.caution { color: var(--caution); }
+    .headline.no { color: var(--stop); }
+    .supporting {
+      font-size: 1.35rem;
+      line-height: 1.35;
+      max-width: 28ch;
+    }
+    .chips-inline { display: flex; gap: 0.45rem; margin-top: 0.9rem; flex-wrap: wrap; }
+    .pill {
+      border: 1px solid var(--line);
+      background: #10151f;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.28rem 0.7rem;
+      font-size: 0.82rem;
+    }
+    .spoken {
+      margin-top: auto;
+      padding-top: 1.1rem;
+      font-size: 1.15rem;
+      line-height: 1.45;
+      color: #dbe4f3;
+    }
+    .cta {
+      margin-top: 0.9rem;
+      display: none;
+    }
+    .cta.show { display: block; }
+    .cta button {
+      font: inherit;
+      font-weight: 700;
+      border: 0;
+      border-radius: 999px;
+      padding: 0.7rem 1.2rem;
+      background: var(--alexa);
+      color: #041018;
+      cursor: pointer;
+    }
+    .wire {
+      background: #0e121a;
+      border-radius: 20px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+    .wire h2 {
+      margin: 0 0 0.5rem;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--mute);
+    }
+    #log {
+      flex: 1;
+      overflow: auto;
+      font-family: ui-monospace, Consolas, monospace;
+      font-size: 0.72rem;
+      line-height: 1.4;
+      color: #b7c2d6;
+      white-space: pre-wrap;
+    }
+    .log-out { color: #7ad7ff; }
+    .log-in { color: #9fe7b8; }
+    .dock {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+      margin-top: 0.85rem;
+    }
+    .dock button, .ask button {
+      font: inherit;
+      border: 1px solid var(--line);
+      background: #121826;
+      color: var(--ink);
+      border-radius: 999px;
+      padding: 0.45rem 0.75rem;
+      cursor: pointer;
+    }
+    .ask {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.7rem;
+    }
+    .ask input {
+      flex: 1;
+      font: inherit;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: #0e121a;
+      color: var(--ink);
+      padding: 0.7rem 1rem;
+    }
+    .ask button.primary { background: var(--alexa); color: #041018; border: 0; font-weight: 700; }
+    label.tts { color: var(--mute); font-size: 0.85rem; display: flex; gap: 0.4rem; align-items: center; }
+    #products { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 0.6rem; margin-top: 0.85rem; }
+    #products figure { margin: 0; background: #0e121a; border: 1px solid var(--line); border-radius: 14px; padding: 0.55rem; }
+    #products img { width: 100%; max-height: 160px; object-fit: contain; background: #000; border-radius: 8px; }
+    #products figcaption { font-size: 0.72rem; color: var(--mute); margin-top: 0.3rem; }
+    .metrics { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+    .metrics span { border: 1px solid var(--line); border-radius: 999px; padding: 0.15rem 0.5rem; font-size: 0.75rem; }
   </style>
 </head>
 <body>
-  <div class="phone">
-    <div class="orb"></div>
-    <h1>Alexa+ · Doc AI</h1>
-    <div class="sub">Simulated Agent Skill · MCP-backed weather</div>
-    <div class="chat" id="chat"></div>
-    <div class="chips">
-      <button type="button" data-q="What's the weather in Rochester?">Current</button>
-      <button type="button" data-q="Give me the three day forecast.">Forecast</button>
-      <button type="button" data-q="Any alerts?">Alerts</button>
-      <button type="button" data-q="What were conditions from 2026-09-15 to 2026-09-18?">History</button>
-      <button type="button" data-q="List my IoT sensors.">IoT</button>
-      <button type="button" data-q="Give me a briefing.">Briefing</button>
+  <div class="stage">
+    <div class="meta">
+      <span>Alexa+ simulated Show · Doc AI MCP · spec 2025-11-25 Streamable HTTP</span>
+      <label class="tts"><input type="checkbox" id="tts" checked /> Speak replies</label>
     </div>
-    <form id="form"><input id="input" placeholder="Ask Doc AI…" autocomplete="off" /><button type="submit">Ask</button></form>
+    <div class="show">
+      <div class="screen">
+        <section class="card">
+          <div class="top">
+            <span>Doc AI · <span id="place">Rochester</span></span>
+            <span><span class="orb" title="listening"></span> <span id="lat">— ms</span></span>
+          </div>
+          <div class="headline" id="headline">Ready</div>
+          <div class="supporting" id="supporting">Ask a household weather job. Alexa+ is the LLM. Doc AI returns facts.</div>
+          <div class="chips-inline" id="pills"></div>
+          <p class="spoken" id="spoken">Initialize MCP, then try: Should I leave the hose out?</p>
+          <div class="cta" id="cta"><button type="button" id="confirmBtn">Confirm freeze watch</button></div>
+        </section>
+        <aside class="wire">
+          <h2>MCP wire · initialize → tools/list → tools/call</h2>
+          <div id="log"></div>
+        </aside>
+      </div>
+      <div class="dock">
+        <button type="button" data-q="What's the weather in Rochester?">Current</button>
+        <button type="button" data-q="Should I leave the hose out?">Leave the hose?</button>
+        <button type="button" data-q="Should I cover the grill?">Cover the grill?</button>
+        <button type="button" data-q="Watch Rochester for freeze">Watch freeze</button>
+        <button type="button" data-q="Confirm freeze watch">Confirm</button>
+        <button type="button" data-q="Give me a briefing.">Briefing</button>
+        <button type="button" data-q="Any alerts?">Alerts</button>
+        <button type="button" data-q="List my IoT sensors.">IoT (sim)</button>
+        <button type="button" data-q="Show radar">Radar</button>
+        <button type="button" data-q="Upper air maps">Upper air</button>
+        <button type="button" data-q="Show satellite">Satellite</button>
+        <button type="button" data-q="Forecast chart">Forecast chart</button>
+        <button type="button" data-q="Skew-T sounding">Skew-T</button>
+      </div>
+      <div id="products"></div>
+      <form class="ask" id="form">
+        <input id="input" placeholder="Ask Doc AI…" autocomplete="off" />
+        <button class="primary" type="submit">Ask</button>
+      </form>
+    </div>
   </div>
   <script>
-    const chat = document.getElementById("chat");
-    function add(role, text) {
-      const el = document.createElement("div");
-      el.className = "msg " + role;
-      el.textContent = text;
-      chat.appendChild(el);
-      chat.scrollTop = chat.scrollHeight;
+    const logEl = document.getElementById("log");
+    const headline = document.getElementById("headline");
+    const supporting = document.getElementById("supporting");
+    const spokenEl = document.getElementById("spoken");
+    const latEl = document.getElementById("lat");
+    const pills = document.getElementById("pills");
+    const cta = document.getElementById("cta");
+    let sessionId = null;
+    let rpcId = 0;
+    let pendingHazard = "freeze";
+
+    function log(dir, payload, ms) {
+      const line = document.createElement("div");
+      line.className = dir === "out" ? "log-out" : "log-in";
+      const prefix = dir === "out" ? "→" : "←";
+      const extra = ms != null ? `  ${ms}ms` : "";
+      line.textContent = prefix + extra + "\n" + JSON.stringify(payload, null, 2);
+      logEl.prepend(line);
     }
-    add("agent", "Hi. I'm Doc AI on Alexa plus. Ask about Rochester weather, forecasts, alerts, history, or IoT nodes.");
-    function route(q) {
-      const s = q.toLowerCase();
-      if (s.includes("iot") || s.includes("sensor")) return ["list_iot_sources", { location: "rochester" }];
-      if (s.includes("brief") || s.includes("summary") || s.includes("tell me everything")) return ["chat_summary", { location: "rochester" }];
-      if (s.includes("histor") || s.includes("2026-09") || s.includes("last week")) return ["get_historical", { location: "rochester", date_range: "2026-09-15 to 2026-09-18" }];
-      if (s.includes("alert")) return ["get_alerts", { location: "rochester" }];
-      if (s.includes("forecast") || s.includes("tomorrow") || s.includes("days")) return ["get_forecast", { location: "rochester", days: 3 }];
+
+    function speak(text) {
+      if (!document.getElementById("tts").checked) return;
+      if (!window.speechSynthesis) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.rate = 1.02;
+      window.speechSynthesis.speak(u);
+    }
+
+    function pickTool(message) {
+      const s = message.toLowerCase();
+      if (/\biot\b|sensor|probe|mesh/.test(s)) return ["list_iot_sources", { location: "rochester" }];
+      if (/should i|can i|safe to|leave the hose|cover the grill|walk the dog/.test(s)) {
+        return ["should_i", { location: "rochester", activity: message }];
+      }
+      if (/\b(confirm|confirmed|go ahead)\b/.test(s) && !/warning|yesterday/.test(s)) {
+        return ["watch_conditions", { location: "rochester", hazard: pendingHazard, confirm: true }];
+      }
+      if (/\bwatch for\b|\bfreeze watch\b|^watch /.test(s)) {
+        return ["watch_conditions", { location: "rochester", hazard: "freeze", confirm: false }];
+      }
+      if (/\bradar\b|\bsatellite\b|\bgoes\b|\bskew|\bsounding\b|\bupper[-\s]?air\b|\b500\s*mb\b/.test(s)) {
+        return ["chat_summary", { location: "rochester" }];
+      }
+      if (/brief|summary|everything/.test(s)) return ["chat_summary", { location: "rochester" }];
+      if (/histor|2026-09|last week/.test(s)) return ["get_historical", { location: "rochester", date_range: "2026-09-15 to 2026-09-18" }];
+      if (/alert|warning|advisory/.test(s)) return ["get_alerts", { location: "rochester" }];
+      if (/forecast|tomorrow|tonight|days/.test(s)) return ["get_forecast", { location: "rochester", days: 3 }];
       return ["get_current_weather", { location: "rochester" }];
     }
+
+    async function mcp(method, params) {
+      const id = method.startsWith("notifications/") ? null : ++rpcId;
+      const body = { jsonrpc: "2.0", id, method, params };
+      log("out", body);
+      const headers = {
+        "Content-Type": "application/json",
+        Accept: "application/json, text/event-stream",
+        "MCP-Protocol-Version": "2025-11-25",
+      };
+      if (sessionId) headers["mcp-session-id"] = sessionId;
+      const t0 = performance.now();
+      const res = await fetch("/mcp", { method: "POST", headers, body: JSON.stringify(body) });
+      const sid = res.headers.get("mcp-session-id");
+      if (sid) sessionId = sid;
+      const text = await res.text();
+      let json = {};
+      try { json = text ? JSON.parse(text) : {}; } catch { json = { raw: text.slice(0, 400) }; }
+      const ms = Math.round(performance.now() - t0);
+      log("in", json, ms);
+      return { json, ms, status: res.status };
+    }
+
+    function renderCard(sc, spoken, ms) {
+      const card = sc.card || {};
+      headline.textContent = card.headline || (sc.reading && sc.reading.tempF != null ? sc.reading.tempF + "°" : "Doc AI");
+      headline.className = "headline" + (card.decision ? " " + card.decision : "");
+      supporting.textContent = card.supporting || spoken;
+      spokenEl.textContent = spoken;
+      latEl.textContent = ms != null ? ms + " ms" : "—";
+      pills.innerHTML = "";
+      [card.chip, card.action].filter(Boolean).forEach((t) => {
+        const el = document.createElement("span");
+        el.className = "pill";
+        el.textContent = t;
+        pills.appendChild(el);
+      });
+      const needs = card.needsConfirm || sc.needsConfirm;
+      cta.className = "cta" + (needs ? " show" : "");
+      if (sc.proposed && sc.proposed.hazard) pendingHazard = sc.proposed.hazard;
+      if (sc.watch && sc.watch.hazard) pendingHazard = sc.watch.hazard;
+    }
+
+    function renderVisuals(visuals) {
+      const root = document.getElementById("products");
+      root.innerHTML = "";
+      (visuals || []).slice(0, 8).forEach((v) => {
+        const fig = document.createElement("figure");
+        const cap = document.createElement("figcaption");
+        cap.textContent = v.title || v.product || "Product";
+        if (v.type === "image" && v.url) {
+          const img = document.createElement("img");
+          img.src = v.url;
+          img.alt = v.title || "";
+          fig.appendChild(img);
+        } else if (v.type === "image_loop" && v.urls && v.urls[0]) {
+          const img = document.createElement("img");
+          img.src = v.urls[0];
+          img.alt = v.title || "loop";
+          fig.appendChild(img);
+        } else if (v.type === "metrics" && v.metrics) {
+          const row = document.createElement("div");
+          row.className = "metrics";
+          v.metrics.forEach((m) => {
+            const s = document.createElement("span");
+            s.textContent = (m.label || "") + " " + (m.value || "");
+            row.appendChild(s);
+          });
+          fig.appendChild(row);
+        } else if (v.href) {
+          const a = document.createElement("a");
+          a.href = v.href;
+          a.target = "_blank";
+          a.rel = "noopener";
+          a.textContent = v.title || "Open product";
+          a.style.color = "var(--alexa)";
+          fig.appendChild(a);
+        }
+        fig.appendChild(cap);
+        root.appendChild(fig);
+      });
+    }
+
+    async function callTool(name, args) {
+      const { json, ms } = await mcp("tools/call", { name, arguments: args });
+      const result = json.result || {};
+      const sc = result.structuredContent || {};
+      const spoken = sc.spoken || (result.content && result.content[0] && result.content[0].text) || json.error?.message || "No reply.";
+      renderCard(sc, spoken, ms);
+      return { sc, spoken, ms };
+    }
+
     async function ask(q) {
-      add("user", q);
-      const [tool, body] = route(q);
-      add("agent", "Checking " + tool + "…");
+      const [name, args] = pickTool(q);
+      spokenEl.textContent = "Calling " + name + "…";
       try {
-        const res = await fetch("/api/tools/" + tool, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const tool = await callTool(name, args);
+        const t0 = performance.now();
+        const res = await fetch("/api/public/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ message: q, location_name: "rochester", location: [43.255, -77.685] }),
+        });
         const data = await res.json();
-        chat.removeChild(chat.lastChild);
-        add("agent", data.spoken || data.error || JSON.stringify(data));
+        const ms = Math.round(performance.now() - t0);
+        const spoken = data.spoken || data.response_text || tool.spoken;
+        renderCard(data.card || data.data || tool.sc, spoken, ms);
+        renderVisuals(data.visuals || []);
+        speak(spoken);
       } catch (e) {
-        chat.removeChild(chat.lastChild);
-        add("agent", "Something went wrong. " + (e.message || e));
+        spokenEl.textContent = "MCP call failed. " + (e.message || e);
       }
     }
+
+    async function boot() {
+      try {
+        const init = await mcp("initialize", {
+          protocolVersion: "2025-11-25",
+          capabilities: {},
+          clientInfo: { name: "doc-ai-show-sim", version: "1.0.0" },
+        });
+        latEl.textContent = init.ms + " ms";
+        await mcp("notifications/initialized", {});
+        await mcp("tools/list", {});
+        supporting.textContent = "MCP session ready. Eight tools listed on the wire.";
+      } catch (e) {
+        supporting.textContent = "Could not initialize MCP. " + (e.message || e);
+      }
+    }
+
     document.getElementById("form").addEventListener("submit", (e) => {
       e.preventDefault();
       const q = document.getElementById("input").value.trim();
@@ -79,7 +425,11 @@
       document.getElementById("input").value = "";
       ask(q);
     });
-    document.querySelectorAll(".chips button").forEach((b) => b.addEventListener("click", () => ask(b.getAttribute("data-q"))));
+    document.querySelectorAll(".dock button").forEach((b) => {
+      b.addEventListener("click", () => ask(b.getAttribute("data-q")));
+    });
+    document.getElementById("confirmBtn").addEventListener("click", () => ask("Confirm freeze watch"));
+    boot();
   </script>
 </body>
 </html>

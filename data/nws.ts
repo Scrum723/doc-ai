@@ -9,7 +9,7 @@ const BASE = "https://api.weather.gov";
 function userAgent(): string {
   return (
     process.env.NWS_USER_AGENT ||
-    "DocAI/1.0 (contact: cclot1@brockport.edu; https://github.com/Scrum723/doc-ai)"
+    "DocAI/1.0 (contact: doc@whatsupdoc.fyi; https://github.com/Scrum723/doc-ai)"
   );
 }
 

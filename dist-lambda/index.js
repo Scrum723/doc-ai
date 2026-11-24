@@ -25679,7 +25679,7 @@ var init_openmeteo = __esm({
 
 // data/nws.ts
 function userAgent() {
-  return process.env.NWS_USER_AGENT || "DocAI/1.0 (contact: cclot1@brockport.edu; https://github.com/Scrum723/doc-ai)";
+  return process.env.NWS_USER_AGENT || "DocAI/1.0 (contact: doc@whatsupdoc.fyi; https://github.com/Scrum723/doc-ai)";
 }
 async function fetchNwsAlerts(lat, lon, locationKey) {
   const url = `${BASE}/alerts/active?point=${lat},${lon}&status=actual`;

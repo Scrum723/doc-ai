@@ -76,3 +76,16 @@ If submitting private instead, share with `testing@devpost.com` and Amazon revie
 DOC / WFAD / SWAFT / DOC Watch are related weather-agent lineage. Doc AI is a new ingest-store-MCP surface (historical, IoT list, chat_summary, two-API SQLite), not a reskin of the locked DOC Watch dock-tool list.
 
 Primary track: **Alexa+ only**.
+
+
+## Auth and CORS
+
+- `DOC_MCP_TOKEN` (required in production): clients send `Authorization: Bearer <token>` to
+  `/mcp`, `/api/tools/:name` and `/api/public/chat`. `/health`, `GET /api/tools` and the static
+  UI stay open. On AWS Lambda the server answers 503 `auth_not_configured` until the token is
+  set, so a deploy is never silently open. Locally an unset token means no auth (dev only).
+- `ALLOWED_ORIGINS`: extra browser origins (comma list). Built in: whatsupdoc.fyi and
+  subdomains (https), localhost, and the server's own host (for the demo UI).
+- Callers to update with the same token: the Alexa+ skill's MCP endpoint config
+  (bearer/auth header), doc-platform-web and weather-agi (`DOC_AI_MCP_TOKEN`).
+- The demo UI prompts once for the token and keeps it in `sessionStorage` for the tab.

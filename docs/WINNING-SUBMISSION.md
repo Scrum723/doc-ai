@@ -273,6 +273,6 @@ Amazon collaborator usernames (private repo path):
 | Health 403 | Fix Function URL + InvokeFunction permissions |
 | Blank sim | Hard refresh; confirm Function URL auth NONE |
 | Slow tools | Keep going; say “cold start on Lambda” once |
-| Wrong city | Use Rochester / Fairport / Long Pond in the sim catalog |
+| Wrong city | Use Rochester / Fairport / Greece in the sim catalog |
 
 You are ready when health is green and one freeze-watch dry-run works. The video is the prize path; a home Echo is not.

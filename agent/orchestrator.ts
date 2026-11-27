@@ -25,7 +25,7 @@ function unknownDesk(loc: { label: string; unknown?: boolean }): ToolOut | null 
   if (!loc.unknown) return null;
   return {
     spoken: spoken(
-      `I don't have a live desk for ${loc.label} yet. Try Rochester, Fairport, or Long Pond — or name that city on Talk to DOC.`
+      `I don't have a live desk for ${loc.label} yet. Try Rochester, Fairport, or Greece — or name that city on Talk to DOC.`
     ),
     data: { error: true, unknown_place: true, location: loc },
     card: card({ headline: "Which place?", supporting: loc.label }),

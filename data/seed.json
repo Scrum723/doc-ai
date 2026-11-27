@@ -3,51 +3,51 @@
     "rochester": {
       "key": "rochester",
       "name": "Rochester, NY",
-      "label": "Rochester / North Greece / Long Pond",
-      "lat": 43.255,
-      "lon": -77.685
+      "label": "Rochester, NY (Monroe County)",
+      "lat": 43.16,
+      "lon": -77.61
     },
     "fairport": {
       "key": "fairport",
       "name": "Fairport, NY",
-      "label": "Fairport Canal docks",
-      "lat": 43.0987,
-      "lon": -77.4419
+      "label": "Fairport, NY (Erie Canal)",
+      "lat": 43.1,
+      "lon": -77.44
     },
     "long_pond": {
       "key": "long_pond",
-      "name": "Long Pond, Greece NY",
-      "label": "Long Pond shoreline",
-      "lat": 43.2585,
-      "lon": -77.692
+      "name": "Greece, NY",
+      "label": "Greece, NY (Lake Ontario shore)",
+      "lat": 43.21,
+      "lon": -77.69
     }
   },
   "iotSources": [
     {
-      "id": "iot-roc-dock-temp",
-      "name": "Long Pond dock temperature probe",
+      "id": "iot-roc-temp",
+      "name": "Rochester temperature probe (sim)",
       "locationKey": "rochester",
       "type": "temperature",
-      "lat": 43.255,
-      "lon": -77.685,
+      "lat": 43.16,
+      "lon": -77.61,
       "unit": "F"
     },
     {
       "id": "iot-roc-humidity",
-      "name": "North Greece humidity node",
+      "name": "Rochester humidity node (sim)",
       "locationKey": "rochester",
       "type": "humidity",
-      "lat": 43.256,
-      "lon": -77.686,
+      "lat": 43.16,
+      "lon": -77.61,
       "unit": "%"
     },
     {
       "id": "iot-fairport-wind",
-      "name": "Fairport canal wind cup",
+      "name": "Fairport wind cup (sim)",
       "locationKey": "fairport",
       "type": "wind",
-      "lat": 43.0987,
-      "lon": -77.4419,
+      "lat": 43.1,
+      "lon": -77.44,
       "unit": "mph"
     }
   ],
@@ -100,7 +100,7 @@
       "humidityPct": 67,
       "windMph": 9,
       "precipIn": 0.0,
-      "text": "Dock probe overnight low"
+      "text": "Probe overnight low"
     },
     {
       "locationKey": "fairport",
@@ -130,7 +130,7 @@
       "tempF": 54,
       "humidityPct": 78,
       "windMph": 7,
-      "text": "Clear over the pond"
+      "text": "Clear near the lake"
     }
   },
   "seedForecast": {

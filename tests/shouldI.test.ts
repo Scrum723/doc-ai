@@ -3,7 +3,7 @@ import { decideShouldI, freezeBand, parseActivity } from "../agent/shouldI.js";
 import { shouldI } from "../agent/orchestrator.js";
 
 const mild = {
-  locationLabel: "Rochester / North Greece / Long Pond",
+  locationLabel: "Rochester, NY (Monroe County)",
   tempF: 55,
   minTempF: 42,
   windMph: 6,

@@ -408,7 +408,7 @@
         const res = await authedFetch("/api/public/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: q, location_name: "rochester", location: [43.255, -77.685] }),
+          body: JSON.stringify({ message: q, location_name: "rochester", location: [43.16, -77.61] }),
         });
         const data = await res.json();
         const ms = Math.round(performance.now() - t0);

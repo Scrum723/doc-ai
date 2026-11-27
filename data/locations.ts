@@ -35,9 +35,36 @@ function seedPath(): string {
   throw new Error(`seed.json not found in ${SEED_CANDIDATES.join(", ")}`);
 }
 
+/**
+ * Precise pins never live in git. To use exact spots locally, point
+ * DOC_AI_LOCATIONS_FILE at a private JSON file shaped like
+ * { "locations": { "<key>": { key, name, label, lat, lon } } };
+ * its entries override the public city/county-level seed.
+ */
+function privateLocations(): Record<string, LocationRecord> {
+  const path = (process.env.DOC_AI_LOCATIONS_FILE || "").trim();
+  if (!path) return {};
+  try {
+    const parsed = JSON.parse(readFileSync(path, "utf8"));
+    const locs = parsed && typeof parsed === "object" ? parsed.locations : null;
+    return locs && typeof locs === "object" ? (locs as Record<string, LocationRecord>) : {};
+  } catch {
+    return {};
+  }
+}
+
 export function loadSeed(): any {
-  if (!cached) cached = JSON.parse(readFileSync(seedPath(), "utf8"));
+  if (!cached) {
+    const seed = JSON.parse(readFileSync(seedPath(), "utf8"));
+    seed.locations = { ...(seed.locations || {}), ...privateLocations() };
+    cached = seed;
+  }
   return cached;
+}
+
+/** Test hook: drop the cached seed so env changes take effect. */
+export function resetSeedCache(): void {
+  cached = null;
 }
 
 export function resolveLocation(input?: {

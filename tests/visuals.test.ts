@@ -19,8 +19,8 @@ describe("Alexa+ chat visuals", () => {
   it("builds live NOAA/IEM image products", () => {
     const pack = buildVisuals({
       message: "show radar and upper air",
-      lat: 43.255,
-      lon: -77.685,
+      lat: 43.16,
+      lon: -77.61,
       locationName: "Rochester",
       toolData: {
         reading: { tempF: 54, humidityPct: 80, windMph: 7, text: "Clear" },
@@ -40,7 +40,7 @@ describe("Alexa+ chat visuals", () => {
     const out = await talkToDocMcp({
       message: "What's the weather in Rochester?",
       location_name: "rochester",
-      location: [43.255, -77.685],
+      location: [43.16, -77.61],
     });
     expect(Array.isArray(out.visuals)).toBe(true);
     expect(out.visuals.length).toBeGreaterThan(0);

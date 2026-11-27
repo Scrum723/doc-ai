@@ -30,7 +30,7 @@ Each entry: task, steps, expected vs actual, severity, workaround, suggestion.
 **Task:** Ingest a second free weather API for alerts (`api.weather.gov`) alongside Open-Meteo.
 
 **Steps:**
-1. `GET https://api.weather.gov/alerts/active?point=43.255,-77.685`.
+1. `GET https://api.weather.gov/alerts/active?point=43.25,-77.68`.
 2. Omit `User-Agent`.
 3. Retry with a descriptive UA.
 

@@ -9,3 +9,6 @@ dist/
 r1.json
 r2.json
 r3.json
+
+# Precise pins stay out of git (see DOC_AI_LOCATIONS_FILE)
+data/private-locations.json

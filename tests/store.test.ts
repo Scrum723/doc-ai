@@ -19,7 +19,7 @@ describe("normalize + store (shipped)", () => {
     const nws = normalizeNwsAlert("rochester", {
       properties: { event: "Wind Advisory", headline: "Wind Advisory", effective: "2026-09-18T12:00:00Z" },
     });
-    const iot = normalizeIot("rochester", "iot-roc-dock-temp", "temperature", 51, "F");
+    const iot = normalizeIot("rochester", "iot-roc-temp", "temperature", 51, "F");
     expect(om.source).toBe(SOURCE_OPEN_METEO);
     expect(nws.source).toBe(SOURCE_NWS);
     expect(iot.source).toBe(SOURCE_IOT);

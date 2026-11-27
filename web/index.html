@@ -238,6 +238,25 @@
     </div>
   </div>
   <script>
+    // DOC_MCP_TOKEN is required by the server. The demo UI asks once and keeps it in
+    // sessionStorage for this tab only (never in the URL or the page source).
+    function docToken() {
+      let t = sessionStorage.getItem("docMcpToken") || "";
+      if (!t) {
+        t = (window.prompt("Doc AI access token") || "").trim();
+        if (t) sessionStorage.setItem("docMcpToken", t);
+      }
+      return t;
+    }
+    function withAuth(headers) {
+      const t = docToken();
+      return t ? { ...headers, Authorization: "Bearer " + t } : headers;
+    }
+    async function authedFetch(url, init) {
+      const res = await fetch(url, { ...init, headers: withAuth(init.headers || {}) });
+      if (res.status === 401) sessionStorage.removeItem("docMcpToken");
+      return res;
+    }
     const logEl = document.getElementById("log");
     const headline = document.getElementById("headline");
     const supporting = document.getElementById("supporting");
@@ -300,7 +319,7 @@
       };
       if (sessionId) headers["mcp-session-id"] = sessionId;
       const t0 = performance.now();
-      const res = await fetch("/mcp", { method: "POST", headers, body: JSON.stringify(body) });
+      const res = await authedFetch("/mcp", { method: "POST", headers, body: JSON.stringify(body) });
       const sid = res.headers.get("mcp-session-id");
       if (sid) sessionId = sid;
       const text = await res.text();
@@ -386,7 +405,7 @@
       try {
         const tool = await callTool(name, args);
         const t0 = performance.now();
-        const res = await fetch("/api/public/chat", {
+        const res = await authedFetch("/api/public/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ message: q, location_name: "rochester", location: [43.255, -77.685] }),

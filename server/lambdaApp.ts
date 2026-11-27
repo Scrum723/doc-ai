@@ -9,19 +9,16 @@ import express, { type Request, type Response } from "express";
 import { ensureSeeded } from "../data/ingest.js";
 import { TOOL_NAMES, runTool } from "../agent/tools.js";
 import { handleLambdaMcpPost } from "./lambdaMcp.js";
+import { corsOptions, originGuard, requireBearer } from "./security.js";
 
 process.env.DOC_AI_DB = process.env.DOC_AI_DB || "/tmp/doc-ai.sqlite";
 
 ensureSeeded();
 
 export const app = express();
-app.use(
-  cors({
-    origin: true,
-    exposedHeaders: ["mcp-session-id", "Mcp-Session-Id"],
-    allowedHeaders: ["Content-Type", "Accept", "mcp-session-id", "MCP-Protocol-Version"],
-  })
-);
+// CORS limited to whatsupdoc.fyi, localhost, ALLOWED_ORIGINS and the Lambda's own host.
+app.use(cors(corsOptions()));
+app.use(originGuard());
 app.use(express.json({ limit: "1mb" }));
 
 const webRoot = [join(process.cwd(), "web"), join("/var/task", "web")].find((p) => existsSync(p));
@@ -46,9 +43,9 @@ app.get("/health", (_req, res) => {
 
 app.get("/api/tools", (_req, res) => res.json({ tools: TOOL_NAMES }));
 
-app.post("/api/tools/:name", async (req: Request, res: Response) => {
+app.post("/api/tools/:name", requireBearer, async (req: Request, res: Response) => {
   try {
-    const out = await runTool(req.params.name, req.body ?? {});
+    const out = await runTool(String(req.params.name), req.body ?? {});
     res.json(out);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -56,7 +53,7 @@ app.post("/api/tools/:name", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/api/public/chat", async (req: Request, res: Response) => {
+app.post("/api/public/chat", requireBearer, async (req: Request, res: Response) => {
   try {
     const { talkToDocMcp } = await import("../agent/routeChat.js");
     const body = req.body || {};
@@ -77,11 +74,11 @@ app.post("/api/public/chat", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/mcp", async (req, res) => {
+app.post("/mcp", requireBearer, async (req, res) => {
   await handleLambdaMcpPost(req, res);
 });
 
-app.get("/mcp", (_req, res) => {
+app.get("/mcp", requireBearer, (_req, res) => {
   res.json({
     ok: true,
     service: "Doc AI",

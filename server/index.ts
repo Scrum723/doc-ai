@@ -15,53 +15,14 @@ import cors from "cors";
 import express, { type NextFunction, type Request, type Response } from "express";
 import { ensureSeeded } from "../data/ingest.js";
 import { registerTools, runTool, TOOL_NAMES } from "../agent/tools.js";
+import { corsOptions, originGuard as sharedOriginGuard, requireBearer } from "./security.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8790);
 const HOST = process.env.HOST || "0.0.0.0";
 
-function allowedOrigins(): string[] {
-  const extra = (process.env.ALLOWED_ORIGINS || "")
-    .split(",")
-    .map((s) => s.trim())
-    .filter(Boolean);
-  return [
-    `http://127.0.0.1:${PORT}`,
-    `http://localhost:${PORT}`,
-    "http://127.0.0.1",
-    "http://localhost",
-    "https://whatsupdoc.fyi",
-    "https://www.whatsupdoc.fyi",
-    "https://api.whatsupdoc.fyi",
-    ...extra,
-  ];
-}
-
-function originAllowed(origin: string | undefined): boolean {
-  if (!origin) return true; // curl / MCP clients without browser Origin
-  const list = allowedOrigins();
-  if (list.includes(origin)) return true;
-  try {
-    const u = new URL(origin);
-    return (
-      u.hostname === "127.0.0.1" ||
-      u.hostname === "localhost" ||
-      u.hostname.endsWith(".awsapprunner.com") ||
-      u.hostname.endsWith(".whatsupdoc.fyi")
-    );
-  } catch {
-    return false;
-  }
-}
-
 function originGuard(req: Request, res: Response, next: NextFunction): void {
-  const origin = req.headers.origin;
-  if (origin && !originAllowed(origin)) {
-    console.warn(`[origin] 403 for ${origin}`);
-    res.status(403).json({ error: "Forbidden origin", origin });
-    return;
-  }
-  next();
+  sharedOriginGuard(PORT)(req, res, next);
 }
 
 function createDocAiServer(): McpServer {
@@ -81,13 +42,7 @@ const app = createMcpExpressApp(
     ? { host: "0.0.0.0" }
     : { host: HOST, allowedHosts: ["127.0.0.1", "localhost"] }
 );
-app.use(
-  cors({
-    origin: (o, cb) => cb(null, originAllowed(o)),
-    exposedHeaders: ["mcp-session-id", "Mcp-Session-Id"],
-    allowedHeaders: ["Content-Type", "Accept", "mcp-session-id", "MCP-Protocol-Version"],
-  })
-);
+app.use(cors(corsOptions(PORT)));
 app.use(express.json({ limit: "2mb" }));
 const webRoot =
   [join(__dirname, "../web"), join(__dirname, "web"), join(process.cwd(), "web")].find((p) =>
@@ -104,7 +59,7 @@ app.get("/health", (_req, res) => {
   });
 });
 
-app.post("/api/public/chat", async (req, res) => {
+app.post("/api/public/chat", originGuard, requireBearer, async (req, res) => {
   try {
     const { talkToDocMcp } = await import("../agent/routeChat.js");
     const body = req.body || {};
@@ -128,9 +83,9 @@ app.post("/api/public/chat", async (req, res) => {
 
 app.get("/api/tools", (_req, res) => res.json({ tools: TOOL_NAMES }));
 
-app.post("/api/tools/:name", async (req, res) => {
+app.post("/api/tools/:name", originGuard, requireBearer, async (req, res) => {
   try {
-    const out = await runTool(req.params.name, req.body ?? {});
+    const out = await runTool(String(req.params.name), req.body ?? {});
     res.json(out);
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
@@ -148,6 +103,7 @@ app.use("/mcp", (req, _res, next) => {
 });
 
 app.use("/mcp", originGuard);
+app.use("/mcp", requireBearer);
 
 app.post("/mcp", async (req: Request, res: Response) => {
   console.log(`[MCP] POST /mcp method=${req.body?.method ?? "n/a"}`);

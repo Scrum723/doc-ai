@@ -76,3 +76,28 @@ If submitting private instead, share with `testing@devpost.com` and Amazon revie
 DOC / WFAD / SWAFT / DOC Watch are related weather-agent lineage. Doc AI is a new ingest-store-MCP surface (historical, IoT list, chat_summary, two-API SQLite), not a reskin of the locked DOC Watch dock-tool list.
 
 Primary track: **Alexa+ only**.
+
+
+## Auth and CORS
+
+- `DOC_MCP_AUTH_MODE`: `off` (default) | `optional` | `required`.
+  - `off`: no bearer check.
+  - `optional`: accept with or without a bearer; log (never the token value) when a request
+    arrives without one; reject a wrong bearer.
+  - `required`: reject without a valid bearer (production end state).
+- `DOC_MCP_TOKEN`: expected `Authorization: Bearer <token>` on `/mcp`, `/api/tools/:name` and
+  `/api/public/chat`. `/health`, `GET /api/tools` and the static UI stay open. Under `required`
+  on AWS Lambda the server answers 503 `auth_not_configured` until the token is set. Locally an
+  unset token under `required` means no auth (dev only).
+- `ALLOWED_ORIGINS`: extra browser origins (comma list). Built in: whatsupdoc.fyi and
+  subdomains (https), localhost, and the server's own host (for the demo UI).
+- Callers that send the same secret under their own env names: Alexa+ MCP connection settings
+  (bearer/auth header), doc-platform-web and weather-agi (`DOC_AI_MCP_TOKEN`).
+- The demo UI prompts once for the token and keeps it in `sessionStorage` for the tab.
+
+### Rollout (env names only)
+
+1. Lambda: set `DOC_MCP_TOKEN` with `DOC_MCP_AUTH_MODE=optional`
+2. Railway: set `DOC_AI_MCP_TOKEN` on weather-agi and doc-platform-web
+3. Alexa+ connection settings: bearer/auth header
+4. Switch Lambda `DOC_MCP_AUTH_MODE=required`

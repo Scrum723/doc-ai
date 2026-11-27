@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import express from "express";
 import type { AddressInfo } from "node:net";
-import { originAllowed, requireBearer, tokenMatches, corsOptions, originGuard } from "../server/security.js";
+import { originAllowed, requireBearer, tokenMatches, corsOptions, originGuard, authMode } from "../server/security.js";
 import cors from "cors";
 
 async function withServer(fn: (base: string) => Promise<void>) {
@@ -22,6 +22,7 @@ async function withServer(fn: (base: string) => Promise<void>) {
 
 afterEach(() => {
   vi.unstubAllEnvs();
+  vi.restoreAllMocks();
 });
 
 describe("origin rules", () => {
@@ -52,8 +53,61 @@ describe("tokenMatches", () => {
   });
 });
 
-describe("requireBearer over HTTP", () => {
+describe("authMode", () => {
+  it("defaults to off; accepts optional and required", () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "");
+    expect(authMode()).toBe("off");
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "optional");
+    expect(authMode()).toBe("optional");
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "REQUIRED");
+    expect(authMode()).toBe("required");
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "weird");
+    expect(authMode()).toBe("off");
+  });
+});
+
+describe("DOC_MCP_AUTH_MODE off", () => {
+  it("skips bearer check even when DOC_MCP_TOKEN is set", async () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "off");
+    vi.stubEnv("DOC_MCP_TOKEN", "t0ken-xyz");
+    await withServer(async (base) => {
+      expect((await fetch(`${base}/mcp`, { method: "POST" })).status).toBe(200);
+      expect(
+        (await fetch(`${base}/mcp`, { method: "POST", headers: { Authorization: "Bearer nope" } })).status,
+      ).toBe(200);
+    });
+  });
+});
+
+describe("DOC_MCP_AUTH_MODE optional", () => {
+  it("allows missing bearer and logs without the token value", async () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "optional");
+    vi.stubEnv("DOC_MCP_TOKEN", "t0ken-xyz");
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    await withServer(async (base) => {
+      expect((await fetch(`${base}/mcp`, { method: "POST" })).status).toBe(200);
+      expect(warn).toHaveBeenCalled();
+      const logged = warn.mock.calls.map((c) => JSON.stringify(c)).join("\n");
+      expect(logged).toContain("request without bearer");
+      expect(logged).not.toContain("t0ken-xyz");
+      const ok = await fetch(`${base}/mcp`, { method: "POST", headers: { Authorization: "Bearer t0ken-xyz" } });
+      expect(ok.status).toBe(200);
+    });
+  });
+  it("rejects a wrong bearer", async () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "optional");
+    vi.stubEnv("DOC_MCP_TOKEN", "t0ken-xyz");
+    await withServer(async (base) => {
+      const bad = await fetch(`${base}/mcp`, { method: "POST", headers: { Authorization: "Bearer nope" } });
+      expect(bad.status).toBe(401);
+      expect(await bad.text()).not.toContain("t0ken-xyz");
+    });
+  });
+});
+
+describe("DOC_MCP_AUTH_MODE required", () => {
   it("401 without or with a wrong token, 200 with the right one", async () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "required");
     vi.stubEnv("DOC_MCP_TOKEN", "t0ken-xyz");
     await withServer(async (base) => {
       expect((await fetch(`${base}/mcp`, { method: "POST" })).status).toBe(401);
@@ -66,6 +120,7 @@ describe("requireBearer over HTTP", () => {
     });
   });
   it("fails closed on Lambda when DOC_MCP_TOKEN is unset", async () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "required");
     vi.stubEnv("DOC_MCP_TOKEN", "");
     vi.stubEnv("AWS_LAMBDA_FUNCTION_NAME", "doc-ai");
     await withServer(async (base) => {
@@ -74,6 +129,7 @@ describe("requireBearer over HTTP", () => {
     });
   });
   it("is open locally when unset (dev only)", async () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "required");
     vi.stubEnv("DOC_MCP_TOKEN", "");
     vi.stubEnv("AWS_LAMBDA_FUNCTION_NAME", "");
     await withServer(async (base) => {
@@ -81,6 +137,7 @@ describe("requireBearer over HTTP", () => {
     });
   });
   it("403 for a foreign browser origin; no CORS header", async () => {
+    vi.stubEnv("DOC_MCP_AUTH_MODE", "required");
     vi.stubEnv("DOC_MCP_TOKEN", "t0ken-xyz");
     await withServer(async (base) => {
       const r = await fetch(`${base}/mcp`, {

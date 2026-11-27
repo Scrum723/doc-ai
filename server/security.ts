@@ -2,17 +2,27 @@
  * Shared auth + CORS for the Express server (server/index.ts) and the Lambda app
  * (server/lambdaApp.ts).
  *
- * - DOC_MCP_TOKEN: bearer required on /mcp, /api/tools/:name and /api/public/chat.
- *   On AWS Lambda the server fails closed (503) if it is unset, so a deploy can never
- *   be silently open. Locally (no AWS_LAMBDA_FUNCTION_NAME) an unset token means open,
- *   for development only.
+ * - DOC_MCP_AUTH_MODE: off | optional | required (default off).
+ *   off: no bearer check. optional: allow missing bearer (log once per request, never the
+ *   token value); validate when present. required: reject without a valid bearer.
+ * - DOC_MCP_TOKEN: expected bearer for /mcp, /api/tools/:name and /api/public/chat.
+ *   Under required mode on AWS Lambda, unset token → 503 so a deploy is never silently open.
+ *   Locally (no AWS_LAMBDA_FUNCTION_NAME) an unset token under required stays open (dev only).
  * - ALLOWED_ORIGINS: extra browser origins (comma list) on top of whatsupdoc.fyi and
  *   localhost. Requests with no Origin (Alexa+, curl, server-to-server) are allowed
- *   through CORS but still need the bearer.
+ *   through CORS but still need the bearer when mode requires it.
  */
 import { createHash, timingSafeEqual } from "node:crypto";
 import type { NextFunction, Request, Response } from "express";
 import type { CorsOptions } from "cors";
+
+export type AuthMode = "off" | "optional" | "required";
+
+export function authMode(): AuthMode {
+  const m = (process.env.DOC_MCP_AUTH_MODE || "off").trim().toLowerCase();
+  if (m === "optional" || m === "required" || m === "off") return m;
+  return "off";
+}
 
 export function allowedOrigins(port?: number): string[] {
   const extra = (process.env.ALLOWED_ORIGINS || "")
@@ -32,7 +42,7 @@ export function allowedOrigins(port?: number): string[] {
 }
 
 export function originAllowed(origin: string | undefined, opts: { port?: number; selfHost?: string } = {}): boolean {
-  if (!origin) return true; // non-browser MCP clients; bearer still required
+  if (!origin) return true; // non-browser MCP clients; bearer still required when mode says so
   if (allowedOrigins(opts.port).includes(origin)) return true;
   try {
     const u = new URL(origin);
@@ -67,6 +77,7 @@ export function originGuard(port?: number) {
   };
 }
 
+/** SHA-256 digests are fixed-length so timingSafeEqual always gets equal-length buffers. */
 function digest(s: string): Buffer {
   return createHash("sha256").update(s, "utf8").digest();
 }
@@ -82,22 +93,38 @@ function bearerFrom(req: Request): string {
   return m ? m[1].trim() : "";
 }
 
-/** Express middleware: require Authorization: Bearer <DOC_MCP_TOKEN>. */
+/** Express middleware: Authorization: Bearer <DOC_MCP_TOKEN> per DOC_MCP_AUTH_MODE. */
 export function requireBearer(req: Request, res: Response, next: NextFunction): void {
   if (req.method === "OPTIONS") {
     next();
     return;
   }
+  const mode = authMode();
+  if (mode === "off") {
+    next();
+    return;
+  }
   const expected = (process.env.DOC_MCP_TOKEN || "").trim();
   if (!expected) {
-    if (process.env.AWS_LAMBDA_FUNCTION_NAME) {
+    if (mode === "required" && process.env.AWS_LAMBDA_FUNCTION_NAME) {
       res.status(503).json({ error: "auth_not_configured" });
       return;
     }
-    next(); // local dev only
+    next(); // optional, or required on local dev only
     return;
   }
-  if (!tokenMatches(bearerFrom(req), expected)) {
+  const presented = bearerFrom(req);
+  if (!presented) {
+    if (mode === "optional") {
+      console.warn("[auth] request without bearer", { method: req.method, path: req.path });
+      next();
+      return;
+    }
+    res.setHeader("WWW-Authenticate", 'Bearer realm="doc-ai"');
+    res.status(401).json({ error: "unauthorized" });
+    return;
+  }
+  if (!tokenMatches(presented, expected)) {
     res.setHeader("WWW-Authenticate", 'Bearer realm="doc-ai"');
     res.status(401).json({ error: "unauthorized" });
     return;
